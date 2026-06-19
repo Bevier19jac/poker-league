@@ -143,6 +143,10 @@
     .rsvp-counts strong { font-family:'JetBrains Mono',monospace; }
     .rsvp-counts .cin  { color:var(--green); }
     .rsvp-counts .cout { color:var(--red); }
+    .name-picker-wrap { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+    .name-picker-label { font-size:0.75rem; color:var(--dim); white-space:nowrap; }
+    .rsvp-card.is-me { outline:2px solid var(--gold); outline-offset:2px; }
+    .you-tag { font-size:0.6rem; background:rgba(245,200,66,0.15); color:var(--gold); padding:2px 7px; border-radius:10px; font-weight:700; letter-spacing:0.08em; margin-left:5px; vertical-align:middle; }
 
     /* ── GENERIC SECTION ── */
     .section { padding:4.5rem 2rem; max-width:1120px; margin:0 auto; }
@@ -379,6 +383,12 @@
         <span class="leg-tbd"><span class="leg-dot"></span>No Response</span>
       </div>
     </div>
+    <div class="name-picker-wrap">
+      <span class="name-picker-label">Who are you?</span>
+      <select class="arch-select" id="name-picker" style="min-width:180px">
+        <option value="">— Tap to identify yourself —</option>
+      </select>
+    </div>
     <div class="rsvp-grid" id="rsvp-grid"></div>
     <div class="rsvp-counts" id="rsvp-counts"></div>
   </div>
@@ -561,64 +571,89 @@ document.addEventListener('DOMContentLoaded',()=>{
   const inSet=new Set((ng.rsvp&&ng.rsvp.in)||[]);
   const outSet=new Set((ng.rsvp&&ng.rsvp.out)||[]);
 
-  // Show only players who've played this season (events > 0)
+  // Name picker — remembers who you are via localStorage
+  let myName=localStorage.getItem('tpl_myname')||'';
   const activePlayers=sorted.filter(p=>p.events>0);
-  const rg=document.getElementById('rsvp-grid');
-  activePlayers.forEach((p,i)=>{
-    const isIn=inSet.has(p.name)||inSet.has(p.fullName);
-    const isOut=outSet.has(p.name)||outSet.has(p.fullName);
-    const cls=isIn?'is-in':isOut?'is-out':'is-tbd';
-    const status=isIn?'✓ In':isOut?'✗ Out':'— TBD';
-    const emoji=pEmoji(i);
-    const color=pColor(i);
-    const div=document.createElement('div');
-    div.className='rsvp-card '+cls;
-    div.innerHTML=`
-      <div class="rsvp-emoji" style="background:${p.avatar?'transparent':color};width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,0.07)">
-        ${p.avatar?`<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${p.name}">`:`<span style="font-size:1.1rem">${emoji}</span>`}
-      </div>
-      <div class="rsvp-name">${p.name}</div>
-      <div class="rsvp-status">${status}</div>
-    `;
-    rg.appendChild(div);
+  const picker=document.getElementById('name-picker');
+  activePlayers.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.name; opt.textContent=p.name+(p.fullName?' ('+p.fullName+')':'');
+    if(p.name===myName) opt.selected=true;
+    picker.appendChild(opt);
   });
 
-  const inCount=activePlayers.filter(p=>inSet.has(p.name)||inSet.has(p.fullName)).length;
-  const outCount=activePlayers.filter(p=>outSet.has(p.name)||outSet.has(p.fullName)).length;
-  const tbdCount=activePlayers.length-inCount-outCount;
-  document.getElementById('rsvp-counts').innerHTML=
-    `<span>Total active players: <strong>${activePlayers.length}</strong></span>
-     <span class="cin">In: <strong>${inCount}</strong></span>
-     <span class="cout">Out: <strong>${outCount}</strong></span>
-     <span>TBD: <strong>${tbdCount}</strong></span>`;
+  function buildRsvpGrid(){
+    const rg=document.getElementById('rsvp-grid');
+    rg.innerHTML='';
+    activePlayers.forEach((p,i)=>{
+      const isIn=inSet.has(p.name)||inSet.has(p.fullName);
+      const isOut=outSet.has(p.name)||outSet.has(p.fullName);
+      const isMe=p.name===myName;
+      const cls=(isMe?'is-me ':'')+(isIn?'is-in':isOut?'is-out':'is-tbd');
+      const status=isIn?'✓ In':isOut?'✗ Out':'— TBD';
+      const emoji=pEmoji(i); const color=pColor(i);
+      const div=document.createElement('div');
+      div.className='rsvp-card '+cls;
+      div.innerHTML=`
+        <div style="background:${p.avatar?'transparent':color};width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,0.07);overflow:hidden">
+          ${p.avatar?`<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${p.name}">`:`<span style="font-size:1.1rem">${emoji}</span>`}
+        </div>
+        <div class="rsvp-name">${p.name}${isMe?' <span class="you-tag">you</span>':''}</div>
+        <div class="rsvp-status">${status}</div>
+      `;
+      rg.appendChild(div);
+    });
+    const inCount=activePlayers.filter(p=>inSet.has(p.name)||inSet.has(p.fullName)).length;
+    const outCount=activePlayers.filter(p=>outSet.has(p.name)||outSet.has(p.fullName)).length;
+    const tbdCount=activePlayers.length-inCount-outCount;
+    document.getElementById('rsvp-counts').innerHTML=
+      `<span>Total active players: <strong>${activePlayers.length}</strong></span>
+       <span class="cin">In: <strong>${inCount}</strong></span>
+       <span class="cout">Out: <strong>${outCount}</strong></span>
+       <span>TBD: <strong>${tbdCount}</strong></span>`;
+  }
+
+  picker.addEventListener('change',()=>{
+    myName=picker.value;
+    if(myName) localStorage.setItem('tpl_myname',myName);
+    else localStorage.removeItem('tpl_myname');
+    buildRsvpGrid();
+    buildStandings();
+  });
+  buildRsvpGrid();
 
   // ── STANDINGS ──
-  document.getElementById('st-notice').innerHTML='⚠ Standings are estimated — update via Admin dashboard after each game.';
+  document.getElementById('st-notice').innerHTML='⚠ Standings order is correct through Event 10 — points are estimated until actual scores are entered via Admin.';
   const tbody=document.getElementById('st-body');
-  sorted.forEach((p,i)=>{
-    const rank=i+1;
-    const avgCls=p.avgPlace<=5?'avg-g':p.avgPlace<=10?'avg-m':'avg-l';
-    const isMe=p.name==='Jacob';
-    const emoji=pEmoji(i); const color=pColor(i);
-    const tr=document.createElement('tr');
-    tr.className=isMe?'me':'';
-    tr.innerHTML=`
-      <td><span class="rk ${rank<=3?'rk'+rank:''}">${rank<=3?['🥇','🥈','🥉'][rank-1]:rank}</span></td>
-      <td><div class="pc">
-        <div class="av" style="background:${p.avatar?'transparent':color}">
-          ${p.avatar?`<img src="${p.avatar}" alt="${p.name}">`:`<span style="font-size:0.9rem">${emoji}</span>`}
-        </div>
-        <div><div class="pn">${p.name}${isMe?' <span style="font-size:.7rem;color:var(--gold)">← you</span>':''}</div><div class="pfn">${p.fullName||''}</div></div>
-      </div></td>
-      <td class="sc hide-m">${p.events}</td>
-      <td><span class="pts">${p.points.toLocaleString()}</span></td>
-      <td class="bar-wrap hide-m"><div class="bar-bg"><div class="bar-fill" style="width:${(p.points/maxPts*100).toFixed(1)}%"></div></div></td>
-      <td class="hide-m">${p.wins>0?`<span class="wbadge">🏆 ${p.wins}</span>`:'-'}</td>
-      <td class="sc hide-m">${p.cashes}</td>
-      <td class="sc ${avgCls}">${p.avgPlace.toFixed(1)}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+
+  function buildStandings(){
+    tbody.innerHTML='';
+    sorted.forEach((p,i)=>{
+      const rank=i+1;
+      const avgCls=p.avgPlace<=5?'avg-g':p.avgPlace<=10?'avg-m':'avg-l';
+      const isMe=myName&&p.name===myName;
+      const emoji=pEmoji(i); const color=pColor(i);
+      const tr=document.createElement('tr');
+      tr.className=isMe?'me':'';
+      tr.innerHTML=`
+        <td><span class="rk ${rank<=3?'rk'+rank:''}">${rank<=3?['🥇','🥈','🥉'][rank-1]:rank}</span></td>
+        <td><div class="pc">
+          <div class="av" style="background:${p.avatar?'transparent':color}">
+            ${p.avatar?`<img src="${p.avatar}" alt="${p.name}">`:`<span style="font-size:0.9rem">${emoji}</span>`}
+          </div>
+          <div><div class="pn">${p.name}${isMe?' <span class="you-tag">you</span>':''}</div><div class="pfn">${p.fullName||''}</div></div>
+        </div></td>
+        <td class="sc hide-m">${p.events}</td>
+        <td><span class="pts">${p.points.toLocaleString()}</span></td>
+        <td class="bar-wrap hide-m"><div class="bar-bg"><div class="bar-fill" style="width:${(p.points/maxPts*100).toFixed(1)}%"></div></div></td>
+        <td class="hide-m">${p.wins>0?`<span class="wbadge">🏆 ${p.wins}</span>`:'-'}</td>
+        <td class="sc hide-m">${p.cashes}</td>
+        <td class="sc ${avgCls}">${p.avgPlace.toFixed(1)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+  buildStandings();
 
   // ── LAST GAME (show for 4 days only) ──
   const lg=L.lastGame;
