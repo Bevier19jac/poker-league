@@ -45,27 +45,29 @@ const LEAGUE = {
   lastGame: {
     date: "2026-06-18",
     label: "Event 10",
-    playerCount: 13,
-    kitty: 250,
+    playerCount: 15,
+    kitty: 220,
     winner: "Karey",
-    recap: "Karey took down Event 10 in a hard-fought field of 13. Frady delivered another strong finish, while Chris P cleaned up at the cash game afterward. Next up: July 2nd — reply to Tod if you're in.",
+    recap: "Karey and Chris F chopped the pot, with Karey winning the deciding hand to claim 1st. Sal finished a strong 3rd. 15 players, $220 kitty. Next up: July 2nd.",
     results: [
-      { place: 1,  name: "Karey",   points: 4600, itm: true,  winnings: 500 },
-      { place: 2,  name: "Frady",   points: 3900, itm: true,  winnings: 300 },
-      { place: 3,  name: "Chris P", points: 3600, itm: true,  winnings: 150 },
-      { place: 4,  name: "Nate",    points: 3300, itm: true,  winnings: 120 },
-      { place: 5,  name: "Tod",     points: 3000, itm: true,  winnings: 80  },
-      { place: 6,  name: "Jeremy",  points: 2700, itm: false, winnings: 0   },
-      { place: 7,  name: "Toner",   points: 2400, itm: false, winnings: 0   },
-      { place: 8,  name: "Brian",   points: 2100, itm: false, winnings: 0   },
-      { place: 9,  name: "JH",      points: 1800, itm: false, winnings: 0   },
-      { place: 10, name: "Charlie", points: 1500, itm: false, winnings: 0   },
-      { place: 11, name: "Vince",   points: 1200, itm: false, winnings: 0   },
-      { place: 12, name: "Eric C",  points:  900, itm: false, winnings: 0   },
-      { place: 13, name: "Jacob",   points:  600, itm: false, winnings: 0   },
+      { place: 1,  name: "Karey",  points: 5000, itm: true,  winnings: 300 },
+      { place: 2,  name: "Chris F",points: 5000, itm: true,  winnings: 300 },
+      { place: 3,  name: "Sal",    points: 4100, itm: true,  winnings: 100 },
+      { place: 4,  name: "Chris P",points: 3700, itm: true,  winnings: 80  },
+      { place: 5,  name: "Matt",   points: 3300, itm: false, winnings: 0   },
+      { place: 6,  name: "Guy",    points: 3000, itm: false, winnings: 0   },
+      { place: 7,  name: "Charlie",points: 2700, itm: false, winnings: 0   },
+      { place: 8,  name: "Jacob",  points: 2400, itm: false, winnings: 0   },
+      { place: 9,  name: "Steve",  points: 2100, itm: false, winnings: 0   },
+      { place: 10, name: "Eric",   points: 1800, itm: false, winnings: 0   },
+      { place: 11, name: "Tod",    points: 1500, itm: false, winnings: 0   },
+      { place: 12, name: "Philo",  points: 1200, itm: false, winnings: 40  },
+      { place: 13, name: "Steele", points:  900, itm: false, winnings: 0   },
+      { place: 14, name: "Nate",   points:  600, itm: false, winnings: 0   },
+      { place: 15, name: "Toner",  points:  300, itm: false, winnings: 0   },
     ],
-    cashGame: { winner: "Chris P", note: "Chris P ran the table at the cash game." },
-    highHand: { player: "", hand: "", description: "— not reported —" },
+    cashGame: { winner: "", note: "" },
+    highHand: { player: "Philo", hand: "", description: "Philo took the $40 side pot." },
   },
 
   // ─── SEASON 20 STANDINGS ─────────────────────────────────────────────
@@ -113,8 +115,8 @@ const LEAGUE = {
 
   // ─── RECORDS ─────────────────────────────────────────────────────────
   records: {
-    highHandAllTime: { player: "— not set —", hand: "",  season: 0,  date: "" },
-    highHandSeason:  { player: "— not set —", hand: "",  season: 20, date: "" },
+    highHandAllTime: { player: "Tod Ellison", hand: "Quad Kings — Ace Kicker", season: 20, date: "" },
+    highHandSeason:  { player: "Tod Ellison", hand: "Quad Kings — Ace Kicker", season: 20, date: "" },
     mostWins:        { player: "Tod Ellison",  count: 15, note: "Career wins all-time" },
     mostSeasons:     { player: "Tod Ellison",  count: 20, note: "All 20 seasons" },
   },
@@ -127,15 +129,26 @@ const LEAGUE = {
     // Add more once you get the board photo
   ],
 
+  // ─── HISTORICAL ARCHIVES ─────────────────────────────────────────────
+  // Season 20 results are live above. Add past season data here as you collect it.
+  // Format per entry:
+  //   { season: N, year: YYYY, events: [{ label, date, playerCount, winner, results: [{place, name, points, itm, winnings}] }] }
+  history: [
+    // Season 20 is current (live data above) — no entry needed here
+    // Example of how to add a past season once you have the data:
+    // { season: 19, year: 2025, events: [
+    //   { label: "Event 1", date: "2025-02-06", playerCount: 12, winner: "Tod", results: [...] },
+    // ]},
+  ],
+
   // ─── NEXT GAME ───────────────────────────────────────────────────────
   nextGame: {
     date: "2026-07-02",
     time: "8:00 PM",
-    note: "Date change — confirm with Tod if you're playing",
+    note: "",
     rsvp: {
-      in:    [],
-      maybe: [],
-      out:   ["Charlie"],
+      in:  [],   // Add names as replies come in: ["Tod", "Jacob", ...]
+      out: [],   // Add names who are out: ["Charlie", ...]
     }
   },
 };
