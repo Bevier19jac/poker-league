@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tod's Poker League — Season 20</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="data.js"></script>
+  <style>
+    :root {
+      --gold: #f5c842;
+      --gold-dim: #c9a020;
+      --felt: #0a3d1f;
+      --felt-light: #0f5229;
+      --dark: #0d0d14;
+      --dark2: #13131f;
+      --dark3: #1a1a2e;
+      --card: #16213e;
+      --text: #e8e8f0;
+      --text-dim: #9090a8;
+      --red: #e84040;
+      --blue: #4080e8;
+      --green: #30c060;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,13,20,0.95); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(245,200,66,0.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+    }
+    .nav-brand { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.1rem; font-weight: 700; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-admin { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; opacity: 0.5; transition: opacity 0.2s; }
+    .nav-admin:hover { opacity: 1; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--felt) 0%, var(--dark) 60%);
+      border-bottom: 1px solid rgba(245,200,66,0.15);
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+    }
+    .hero-season { font-size: 0.8rem; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.75rem; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 0.5rem; }
+    .hero-sub { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2.5rem; }
+
+    .countdown-label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+    .countdown { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+    .cd-block { text-align: center; }
+    .cd-num { font-family: 'JetBrains Mono', monospace; font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 700; color: #fff; line-height: 1; }
+    .cd-unit { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-top: 4px; }
+    .cd-sep { font-family: 'JetBrains Mono', monospace; font-size: 2rem; color: var(--gold-dim); align-self: flex-start; padding-top: 4px; }
+
+    .hero-note { margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-dim); }
+    .hero-note .rsvp-out { color: var(--red); }
+
+    /* ── SECTIONS ── */
+    .section { padding: 3rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold);
+      margin-bottom: 1.5rem; padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(245,200,66,0.2);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .section-title .icon { font-size: 1.2rem; }
+
+    /* ── STANDINGS ── */
+    .standings-banner {
+      background: rgba(232,64,64,0.12); border: 1px solid rgba(232,64,64,0.3);
+      border-radius: var(--radius); padding: 0.75rem 1rem;
+      font-size: 0.8rem; color: #f09090; margin-bottom: 1rem;
+    }
+    .standings-table { width: 100%; border-collapse: collapse; }
+    .standings-table th {
+      text-align: left; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim); padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .standings-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; }
+    .standings-table tr:hover td { background: rgba(255,255,255,0.03); }
+    .rank-cell { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); width: 40px; }
+    .rank-1 { color: var(--gold); font-weight: 700; }
+    .rank-2 { color: #c0c0c0; }
+    .rank-3 { color: #cd7f32; }
+    .name-cell { font-weight: 600; }
+    .fullname-cell { color: var(--text-dim); font-size: 0.8rem; }
+    .points-cell { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--gold); }
+    .bar-cell { min-width: 100px; }
+    .pts-bar-wrap { background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; overflow: hidden; }
+    .pts-bar { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+    .avg-cell { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .win-badge { background: var(--gold); color: var(--dark); font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 20px; }
+    .events-cell { color: var(--text-dim); font-size: 0.85rem; }
+
+    /* ── LAST GAME ── */
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 640px) { .results-grid { grid-template-columns: 1fr; } }
+    .results-card { background: var(--card); border-radius: var(--radius); overflow: hidden; }
+    .results-card-header { background: var(--felt); padding: 1rem 1.25rem; }
+    .results-card-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); }
+    .results-card-header p { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+    .results-recap { padding: 1rem 1.25rem; font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .results-list { list-style: none; padding: 0.5rem 0; }
+    .results-list li {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .place-badge {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .place-1 { background: var(--gold); color: var(--dark); }
+    .place-2 { background: #c0c0c0; color: var(--dark); }
+    .place-3 { background: #cd7f32; color: #fff; }
+    .place-other { background: rgba(255,255,255,0.08); color: var(--text-dim); }
+    .result-name { flex: 1; font-weight: 500; }
+    .itm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .result-winnings { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--green); font-weight: 600; }
+    .result-points { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-dim); }
+
+    .side-info { display: flex; flex-direction: column; gap: 1rem; }
+    .info-card { background: var(--card); border-radius: var(--radius); padding: 1.25rem; }
+    .info-card h4 { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.5rem; }
+    .info-card p { font-size: 0.95rem; color: var(--text); }
+    .info-card .sub { font-size: 0.8rem; color: var(--text-dim); margin-top: 3px; }
+
+    /* ── SCHEDULE ── */
+    .schedule-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .sched-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.75rem 1rem; border-radius: var(--radius);
+      background: rgba(255,255,255,0.03); border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .sched-row.done { opacity: 0.35; }
+    .sched-row.next { border-color: var(--gold); background: rgba(245,200,66,0.07); animation: pulse-border 2s infinite; }
+    .sched-row.tournament { border-color: var(--blue); background: rgba(64,128,232,0.07); }
+    .sched-row.final { border-color: var(--red); background: rgba(232,64,64,0.07); }
+    @keyframes pulse-border { 0%,100%{border-color:var(--gold)} 50%{border-color:rgba(245,200,66,0.3)} }
+    .sched-date { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-dim); min-width: 110px; }
+    .sched-label { flex: 1; font-weight: 500; }
+    .sched-row.next .sched-label { color: var(--gold); }
+    .sched-row.tournament .sched-label { color: var(--blue); }
+    .sched-row.final .sched-label { color: var(--red); }
+    .sched-tag {
+      font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 20px; font-weight: 600;
+    }
+    .tag-next { background: rgba(245,200,66,0.15); color: var(--gold); }
+    .tag-done { background: rgba(255,255,255,0.08); color: var(--text-dim); }
+    .tag-tournament { background: rgba(64,128,232,0.15); color: var(--blue); }
+    .tag-final { background: rgba(232,64,64,0.15); color: var(--red); }
+
+    /* ── RECORDS ── */
+    .records-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+    .record-card { background: var(--card); border-radius: var(--radius); padding: 1.25rem; border: 1px solid rgba(255,255,255,0.06); }
+    .record-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.5rem; }
+    .record-value { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--gold); }
+    .record-sub { font-size: 0.8rem; color: var(--text-dim); margin-top: 3px; }
+
+    /* ── ROSTER ── */
+    .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 1rem; }
+    .roster-card {
+      background: var(--card); border-radius: var(--radius); padding: 1rem 0.75rem;
+      text-align: center; cursor: default; transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .roster-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .avatar {
+      width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 0.6rem;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.1rem; color: #fff; overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .roster-name { font-size: 0.85rem; font-weight: 600; }
+    .roster-full { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+    .roster-pts { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-top: 4px; }
+
+    /* ── CHAMPIONS ── */
+    .champions-list { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .champ-card { background: var(--card); border-radius: var(--radius); padding: 1rem 1.25rem; border: 1px solid rgba(245,200,66,0.15); }
+    .champ-season { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+    .champ-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #fff; margin-top: 2px; }
+    .champ-note { font-size: 0.75rem; color: var(--text-dim); }
+
+    /* ── FOOTER ── */
+    footer { text-align: center; padding: 2rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 2rem; }
+    footer a { color: var(--text-dim); text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">♠ Tod's Poker League</div>
+  <div class="nav-links">
+    <a href="#standings">Standings</a>
+    <a href="#last-game">Last Game</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#roster">Roster</a>
+  </div>
+  <a href="admin.html" class="nav-admin">Admin</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-season" id="hero-season"></div>
+  <h1 class="hero-title" id="hero-title"></h1>
+  <p class="hero-sub" id="hero-sub"></p>
+  <div class="countdown-label">Next Game In</div>
+  <div class="countdown" id="countdown">
+    <div class="cd-block"><div class="cd-num" id="cd-days">--</div><div class="cd-unit">Days</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-block"><div class="cd-num" id="cd-hours">--</div><div class="cd-unit">Hours</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-block"><div class="cd-num" id="cd-mins">--</div><div class="cd-unit">Mins</div></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-block"><div class="cd-num" id="cd-secs">--</div><div class="cd-unit">Secs</div></div>
+  </div>
+  <div class="hero-note" id="hero-note"></div>
+</section>
+
+<!-- STANDINGS -->
+<div id="standings" class="section">
+  <div class="section-title"><span class="icon">♣</span> Season Standings</div>
+  <div class="standings-banner" id="standings-banner"></div>
+  <table class="standings-table" id="standings-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>Events</th>
+        <th>Points</th>
+        <th style="min-width:80px"></th>
+        <th>W</th>
+        <th>Cashes</th>
+        <th>Avg Place</th>
+      </tr>
+    </thead>
+    <tbody id="standings-body"></tbody>
+  </table>
+</div>
+
+<!-- LAST GAME -->
+<div id="last-game" class="section">
+  <div class="section-title"><span class="icon">♦</span> Last Game Results</div>
+  <div class="results-grid">
+    <div class="results-card">
+      <div class="results-card-header">
+        <h3 id="lg-title"></h3>
+        <p id="lg-meta"></p>
+      </div>
+      <div class="results-recap" id="lg-recap"></div>
+      <ul class="results-list" id="results-list"></ul>
+    </div>
+    <div class="side-info" id="side-info"></div>
+  </div>
+</div>
+
+<!-- SCHEDULE -->
+<div id="schedule" class="section">
+  <div class="section-title"><span class="icon">♥</span> Season Schedule</div>
+  <div class="schedule-list" id="schedule-list"></div>
+</div>
+
+<!-- RECORDS -->
+<div class="section">
+  <div class="section-title"><span class="icon">♠</span> League Records</div>
+  <div class="records-grid" id="records-grid"></div>
+</div>
+
+<!-- ROSTER -->
+<div id="roster" class="section">
+  <div class="section-title"><span class="icon">♣</span> Player Roster</div>
+  <div class="roster-grid" id="roster-grid"></div>
+</div>
+
+<!-- CHAMPIONS -->
+<div class="section">
+  <div class="section-title"><span class="icon">♦</span> Past Champions</div>
+  <div class="champions-list" id="champions-list"></div>
+</div>
+
+<footer>
+  <p>Tod's Poker League · Peachtree City, GA · <a href="admin.html">Admin</a></p>
+</footer>
+
+<script>
+// ── AVATAR COLOR ──
+function avatarColor(name) {
+  const colors = ['#c0392b','#8e44ad','#2980b9','#16a085','#d35400','#27ae60','#2c3e50','#7f8c8d','#e74c3c','#9b59b6'];
+  let h = 0; for (let i=0; i<name.length; i++) h = name.charCodeAt(i) + ((h<<5)-h);
+  return colors[Math.abs(h) % colors.length];
+}
+function initials(name) { return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+
+// ── COUNTDOWN ──
+function updateCountdown() {
+  const ng = LEAGUE.nextGame;
+  const target = new Date(ng.date + 'T' + (ng.time || '20:00') + ':00');
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) {
+    ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  const L = LEAGUE;
+
+  // Hero
+  document.getElementById('hero-season').textContent = `Season ${L.season} · ${L.location}`;
+  document.getElementById('hero-title').textContent = L.name;
+  const ng = L.nextGame;
+  const ngDate = new Date(ng.date + 'T20:00:00');
+  document.getElementById('hero-sub').textContent =
+    `Next game: ${ngDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} at ${ng.time || '8:00 PM'}`;
+  let noteHtml = ng.note ? `<span>${ng.note}</span>` : '';
+  if (ng.rsvp && ng.rsvp.out && ng.rsvp.out.length)
+    noteHtml += `  ·  <span class="rsvp-out">Out: ${ng.rsvp.out.join(', ')}</span>`;
+  if (ng.rsvp && ng.rsvp.in && ng.rsvp.in.length)
+    noteHtml += `  ·  In: ${ng.rsvp.in.join(', ')}`;
+  document.getElementById('hero-note').innerHTML = noteHtml;
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Standings
+  document.getElementById('standings-banner').textContent =
+    '⚠ Standings are estimated — Tod or Jacob can update via Admin after each game.';
+  const sorted = [...L.standings].sort((a,b) => b.points - a.points);
+  const maxPts = sorted[0].points;
+  const tbody = document.getElementById('standings-body');
+  sorted.forEach((p, i) => {
+    const rank = i + 1;
+    const rankClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-cell';
+    const avgColor = p.avgPlace <= 5 ? '#30c060' : p.avgPlace <= 10 ? '#f5c842' : '#9090a8';
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="rank-cell ${rankClass}">${rank}</td>
+      <td class="name-cell">${p.name}${p.wins>0?` <span class="win-badge">${p.wins}W</span>`:''}</td>
+      <td class="events-cell">${p.events}</td>
+      <td class="points-cell">${p.points.toLocaleString()}</td>
+      <td class="bar-cell"><div class="pts-bar-wrap"><div class="pts-bar" style="width:${(p.points/maxPts*100).toFixed(1)}%"></div></div></td>
+      <td>${p.cashes}</td>
+      <td>${p.cashes}</td>
+      <td class="avg-cell" style="color:${avgColor}">${p.avgPlace.toFixed(1)}</td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  // Last Game
+  const lg = L.lastGame;
+  document.getElementById('lg-title').textContent = `${lg.label} — ${lg.winner} Wins`;
+  document.getElementById('lg-meta').textContent =
+    `${new Date(lg.date+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · ${lg.playerCount} players · $${lg.kitty} kitty`;
+  document.getElementById('lg-recap').textContent = lg.recap;
+  const ul = document.getElementById('results-list');
+  lg.results.forEach(r => {
+    const li = document.createElement('li');
+    const badgeClass = r.place===1?'place-1':r.place===2?'place-2':r.place===3?'place-3':'place-other';
+    li.innerHTML = `
+      <div class="place-badge ${badgeClass}">${r.place}</div>
+      <div class="result-name">${r.name}</div>
+      ${r.itm ? '<div class="itm-dot" title="In The Money"></div>' : '<div style="width:8px"></div>'}
+      <div class="result-points">${r.points.toLocaleString()}</div>
+      ${r.winnings > 0 ? `<div class="result-winnings">$${r.winnings}</div>` : ''}
+    `;
+    ul.appendChild(li);
+  });
+  const sideInfo = document.getElementById('side-info');
+  if (lg.cashGame && lg.cashGame.winner) {
+    sideInfo.innerHTML += `<div class="info-card"><h4>Cash Game</h4><p>${lg.cashGame.winner}</p><p class="sub">${lg.cashGame.note||''}</p></div>`;
+  }
+  if (lg.highHand && lg.highHand.description && lg.highHand.description !== '— not reported —') {
+    sideInfo.innerHTML += `<div class="info-card"><h4>High Hand</h4><p>${lg.highHand.player}</p><p class="sub">${lg.highHand.hand}</p></div>`;
+  }
+  sideInfo.innerHTML += `<div class="info-card"><h4>Next Game</h4><p>${new Date(ng.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</p><p class="sub">${ng.time} · ${ng.note||''}</p></div>`;
+
+  // Schedule
+  const today = new Date().toISOString().slice(0,10);
+  const nextIdx = L.schedule.findIndex(e => !e.completed);
+  const schedList = document.getElementById('schedule-list');
+  L.schedule.forEach((ev, i) => {
+    const isNext = i === nextIdx;
+    const cls = ev.completed ? 'done' : isNext ? 'next' : ev.type === 'tournament' ? 'tournament' : ev.type === 'final' ? 'final' : '';
+    const tag = ev.completed ? '<span class="sched-tag tag-done">Done</span>' :
+                isNext ? '<span class="sched-tag tag-next">Next</span>' :
+                ev.type === 'tournament' ? '<span class="sched-tag tag-tournament">Tournament</span>' :
+                ev.type === 'final' ? '<span class="sched-tag tag-final">Final</span>' : '';
+    const d = new Date(ev.date+'T12:00:00');
+    const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const div = document.createElement('div');
+    div.className = `sched-row ${cls}`;
+    div.innerHTML = `<span class="sched-date">${dateStr}</span><span class="sched-label">${ev.label}${ev.note?' <small style="color:var(--text-dim)">— '+ev.note+'</small>':''}</span>${tag}`;
+    schedList.appendChild(div);
+  });
+
+  // Records
+  const rec = L.records;
+  const recGrid = document.getElementById('records-grid');
+  recGrid.innerHTML = `
+    <div class="record-card"><div class="record-label">High Hand — Season ${rec.highHandSeason.season}</div><div class="record-value">${rec.highHandSeason.player}</div><div class="record-sub">${rec.highHandSeason.hand||'Not yet set'}</div></div>
+    <div class="record-card"><div class="record-label">High Hand — All Time</div><div class="record-value">${rec.highHandAllTime.player}</div><div class="record-sub">${rec.highHandAllTime.hand||'Not yet set'}</div></div>
+    <div class="record-card"><div class="record-label">Most Career Wins</div><div class="record-value">${rec.mostWins.player}</div><div class="record-sub">${rec.mostWins.count} wins · ${rec.mostWins.note}</div></div>
+    <div class="record-card"><div class="record-label">Most Seasons Played</div><div class="record-value">${rec.mostSeasons.player}</div><div class="record-sub">${rec.mostSeasons.count} seasons · ${rec.mostSeasons.note}</div></div>
+  `;
+
+  // Roster
+  const rosterGrid = document.getElementById('roster-grid');
+  sorted.forEach(p => {
+    const color = avatarColor(p.fullName || p.name);
+    const hasAvatar = p.avatar;
+    const card = document.createElement('div');
+    card.className = 'roster-card';
+    card.innerHTML = `
+      <div class="avatar" style="background:${hasAvatar?'transparent':color}">
+        ${hasAvatar ? `<img src="${p.avatar}" alt="${p.name}">` : initials(p.fullName || p.name)}
+      </div>
+      <div class="roster-name">${p.name}</div>
+      <div class="roster-full">${p.fullName||''}</div>
+      <div class="roster-pts">${p.points.toLocaleString()} pts</div>
+    `;
+    rosterGrid.appendChild(card);
+  });
+
+  // Champions
+  const champList = document.getElementById('champions-list');
+  L.champions.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'champ-card';
+    div.innerHTML = `<div class="champ-season">Season ${c.season} · ${c.year}</div><div class="champ-name">${c.champion}</div><div class="champ-note">${c.note||''}</div>`;
+    champList.appendChild(div);
+  });
+});
+</script>
+</body>
+</html>
