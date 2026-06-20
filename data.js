@@ -10,6 +10,15 @@ const LEAGUE = {
   host: "Tod Ellison",
   location: "Peachtree City, GA",
 
+  // ── ANNOUNCEMENTS ──
+  // Set active:true to show a banner above the RSVP section
+  // type options: "info" (blue) | "special" (gold) | "warning" (red)
+  announcements: [
+    // { active: true, type: "special", icon: "🎁", text: "Toys for Tots drive — bring a new unwrapped toy to the next game night!" },
+    // { active: true, type: "info",    icon: "📅", text: "Next game confirmed: July 2nd at 8 PM at Tod's" },
+    // { active: true, type: "warning", icon: "⚠",  text: "Location change for next event — contact Tod for details" },
+  ],
+
   schedule: [
     { date: "2026-02-19", label: "Event 1",               type: "regular",    completed: true  },
     { date: "2026-03-05", label: "Event 2",               type: "regular",    completed: true  },
@@ -48,16 +57,16 @@ const LEAGUE = {
       { place: 9,  name: "Steve",   points: 2100, itm: false, winnings: 0   },
       { place: 10, name: "Eric",    points: 1800, itm: false, winnings: 0   },
       { place: 11, name: "Tod",     points: 1500, itm: false, winnings: 0   },
-      { place: 12, name: "Philo",   points: 1200, itm: false, winnings: 40  },
+      { place: 12, name: "Philo",   points: 1200, itm: false, winnings: 0   },
       { place: 13, name: "Steele",  points:  900, itm: false, winnings: 0   },
       { place: 14, name: "Nate",    points:  600, itm: false, winnings: 0   },
       { place: 15, name: "Toner",   points:  300, itm: false, winnings: 0   },
     ],
     cashGame: { winner: "", note: "" },
-    highHand: { player: "Philo", hand: "", description: "Philo took the $40 side pot." },
+    highHand: { player: "", hand: "", description: "" },
   },
 
-  // STANDINGS - sourced directly from Tod's APL Season 20 tracker after Event 10
+  // STANDINGS — sourced directly from Tod's APL Season 20 tracker after Event 10
   standings: [
     { name: "Tod",     fullName: "Tod Ellison",       events: 10, points: 41400, wins: 1, cashes: 3, avgPlace: 7.7  },
     { name: "Guy",     fullName: "Guy Caldwell",      events: 8,  points: 35800, wins: 2, cashes: 5, avgPlace: 7.4  },
@@ -112,9 +121,6 @@ const LEAGUE = {
     date: "2026-07-02",
     time: "8:00 PM",
     note: "",
-    rsvp: {
-      in:  [],
-      out: [],
-    }
+    rsvp: { in: [], out: [] }
   },
 };
