@@ -675,11 +675,26 @@ document.addEventListener('DOMContentLoaded',function(){
   // Firebase key tied to next game date — auto-resets each event
   var fbKey='rsvp_'+ng.date.replace(/-/g,'_');
   var fbStatuses={};
+  var fbLive=false; // true once Firebase is connected
+
+  // ── Load statuses: Firebase if configured, else localStorage ──
+  function loadLocalStatuses(){
+    try{ var s=localStorage.getItem('tpl_rsvp_'+fbKey); fbStatuses=s?JSON.parse(s):{}; }
+    catch(e){ fbStatuses={}; }
+  }
 
   function setStatus(status){
     if(!myName) return;
-    try { firebase.database().ref(fbKey+'/'+myName).set(status); }
-    catch(e){ console.warn('Firebase:',e.message); }
+    if(fbLive){
+      // Firebase path — updates all devices in real time
+      try { firebase.database().ref(fbKey+'/'+myName).set(status); }
+      catch(e){ console.warn('Firebase write:',e.message); }
+    } else {
+      // Local fallback — saves to this browser until Firebase is set up
+      fbStatuses[myName]=status;
+      try{ localStorage.setItem('tpl_rsvp_'+fbKey,JSON.stringify(fbStatuses)); }catch(e){}
+      buildRsvpGrid(); // re-render immediately so button lights up
+    }
   }
   window.setStatus=setStatus;
 
@@ -715,12 +730,19 @@ document.addEventListener('DOMContentLoaded',function(){
       '<span>TBD: <strong>'+(activePlayers.length-inC-maybeC-outC)+'</strong></span>';
   }
 
+  // Subscribe to Firebase for live sync; fall back to localStorage
+  loadLocalStatuses();
+  buildRsvpGrid(); // render immediately with local data
   try {
     firebase.database().ref(fbKey).on('value',function(snap){
       fbStatuses=snap.val()||{};
-      buildRsvpGrid();
+      fbLive=true;
+      buildRsvpGrid(); // re-render with live Firebase data
     });
-  } catch(e){ buildRsvpGrid(); }
+  } catch(e){
+    // Firebase not yet configured — localStorage fallback active
+    console.info('RSVP running in local-only mode. Set up firebase-config.js to sync across devices.');
+  }
 
   picker.addEventListener('change',function(){
     myName=picker.value;
