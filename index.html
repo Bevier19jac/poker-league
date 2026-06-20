@@ -7,381 +7,191 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="data.js"></script>
-  <!-- Firebase SDK (live RSVP) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
   <style>
-    :root {
-      --gold:   #f5c842;
-      --gold2:  #e8a800;
-      --gold3:  #fde68a;
-      --felt:   #0a3d1f;
-      --felt2:  #062b15;
-      --wood:   #5c3a1e;
-      --wood2:  #3d2510;
-      --dark:   #080810;
-      --dark2:  #0e0e1a;
-      --card:   #111122;
-      --border: rgba(245,200,66,0.1);
-      --text:   #f0f0f8;
-      --dim:    #8888aa;
-      --faint:  #3a3a55;
-      --red:    #ef4444;
-      --blue:   #3b82f6;
-      --green:  #22c55e;
-      --r:      12px;
+    :root{
+      --gold:#f5c842;--gold2:#e8a800;--gold3:#fde68a;
+      --felt:#0a3d1f;--felt2:#062b15;
+      --wood:#5c3a1e;--wood2:#3d2510;
+      --dark:#080810;--dark2:#0e0e1a;--card:#111122;
+      --border:rgba(245,200,66,0.1);
+      --text:#f0f0f8;--dim:#8888aa;--faint:#3a3a55;
+      --red:#ef4444;--blue:#3b82f6;--green:#22c55e;
     }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    html { scroll-behavior:smooth; }
-    body { background:var(--dark); color:var(--text); font-family:'Inter',sans-serif; overflow-x:hidden; }
-    ::-webkit-scrollbar { width:5px; }
-    ::-webkit-scrollbar-track { background:var(--dark2); }
-    ::-webkit-scrollbar-thumb { background:var(--gold2); border-radius:3px; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--dark);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:var(--dark2)}
+    ::-webkit-scrollbar-thumb{background:var(--gold2);border-radius:3px}
 
-    /* ── NAV ── */
-    nav {
-      position:fixed; top:0; left:0; right:0; z-index:200;
-      height:60px; display:flex; align-items:center; justify-content:space-between;
-      padding:0 2rem;
-      background:rgba(8,8,16,0.92); backdrop-filter:blur(20px);
-      border-bottom:1px solid rgba(245,200,66,0.1);
-    }
-    .nav-brand { font-family:'Playfair Display',serif; font-size:1rem; font-weight:900; color:var(--gold); display:flex; align-items:center; gap:0.5rem; }
-    .nav-links  { display:flex; gap:0.2rem; }
-    .nav-links a { color:var(--dim); text-decoration:none; font-size:0.78rem; font-weight:500; letter-spacing:0.04em; padding:0.4rem 0.85rem; border-radius:20px; transition:all 0.2s; }
-    .nav-links a:hover { color:var(--gold); background:rgba(245,200,66,0.07); }
-    .nav-admin  { font-size:0.72rem; color:var(--faint); text-decoration:none; border:1px solid var(--faint); padding:0.3rem 0.8rem; border-radius:20px; transition:all 0.2s; }
-    .nav-admin:hover { color:var(--dim); border-color:var(--dim); }
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(8,8,16,0.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(245,200,66,0.12)}
+    .nav-brand{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:var(--gold);text-decoration:none;white-space:nowrap}
+    .nav-links{display:flex;gap:0.1rem;align-items:center}
+    .nav-links a{color:var(--dim);text-decoration:none;font-size:0.72rem;font-weight:500;letter-spacing:0.04em;padding:0.32rem 0.65rem;border-radius:20px;transition:all 0.2s;white-space:nowrap}
+    .nav-links a:hover,.nav-links a.active{color:var(--gold);background:rgba(245,200,66,0.08)}
+    .nav-links a.special{color:#fbbf24;border:1px solid rgba(251,191,36,0.28)}
+    .nav-links a.special:hover,.nav-links a.special.active{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.5)}
+    .nav-admin{font-size:0.68rem;color:var(--faint);text-decoration:none;border:1px solid rgba(90,90,120,0.35);padding:0.26rem 0.65rem;border-radius:20px;transition:all 0.2s;margin-left:0.4rem}
+    .nav-admin:hover{color:var(--dim);border-color:var(--dim)}
+    @media(max-width:780px){.nav-links a{font-size:0.64rem;padding:0.28rem 0.45rem}.nav-links a.special{display:none}}
 
-    /* ── HERO ── */
-    .hero {
-      position:relative; min-height:100vh;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      padding:80px 2rem 3rem; text-align:center; overflow:hidden;
-    }
-    .hero-bg {
-      position:absolute; inset:0; z-index:0;
-      background:
-        repeating-linear-gradient(45deg,transparent 0,transparent 3px,rgba(0,60,15,0.03) 3px,rgba(0,60,15,0.03) 6px),
-        repeating-linear-gradient(-45deg,transparent 0,transparent 3px,rgba(0,60,15,0.02) 3px,rgba(0,60,15,0.02) 6px),
-        radial-gradient(ellipse 90% 65% at 50% -5%, rgba(10,61,31,0.97) 0%, rgba(6,43,21,0.85) 40%, transparent 68%),
-        radial-gradient(ellipse 50% 35% at 10% 95%, rgba(245,200,66,0.04) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 35% at 90% 95%, rgba(245,200,66,0.04) 0%, transparent 60%),
-        var(--dark);
-    }
+    /* HERO */
+    .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 2rem 4rem;text-align:center;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;z-index:0;background:
+      repeating-linear-gradient(45deg,transparent 0,transparent 3px,rgba(0,60,15,0.03) 3px,rgba(0,60,15,0.03) 6px),
+      repeating-linear-gradient(-45deg,transparent 0,transparent 3px,rgba(0,60,15,0.02) 3px,rgba(0,60,15,0.02) 6px),
+      radial-gradient(ellipse 90% 65% at 50% -5%,rgba(10,61,31,0.97) 0%,rgba(6,43,21,0.85) 40%,transparent 68%),
+      radial-gradient(ellipse 50% 35% at 10% 95%,rgba(245,200,66,0.04) 0%,transparent 60%),
+      radial-gradient(ellipse 50% 35% at 90% 95%,rgba(245,200,66,0.04) 0%,transparent 60%),
+      var(--dark)}
 
-    /* Floating card suits */
-    .float-suits { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-    .fs { position:absolute; opacity:0.03; animation:rise linear infinite; user-select:none; font-weight:900; }
-    @keyframes rise { from{transform:translateY(110vh) rotate(0deg)} to{transform:translateY(-20vh) rotate(360deg)} }
+    /* PLAYING CARDS */
+    .hand-pair{position:absolute;z-index:0;pointer-events:none;display:flex;align-items:flex-end;filter:drop-shadow(0 8px 28px rgba(0,0,0,0.85))}
+    .pc{width:54px;height:76px;background:linear-gradient(160deg,#fefefe 0%,#f2f2ee 100%);border-radius:6px;border:1px solid rgba(160,150,130,0.5);display:flex;flex-direction:column;justify-content:space-between;padding:4px 5px;position:relative;overflow:hidden;font-family:'Playfair Display',serif;font-weight:900}
+    .pc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.5) 0%,transparent 55%);pointer-events:none}
+    .pc::after{content:attr(data-s);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.9rem;line-height:1;opacity:0.09}
+    .pc-t,.pc-b{display:flex;flex-direction:column;line-height:1}
+    .pc-b{align-self:flex-end;transform:rotate(180deg)}
+    .pc-r{font-size:0.9rem;line-height:1.05}
+    .pc-s{font-size:0.68rem;line-height:1}
+    .rc{color:#cc1a1a}
+    .bk{color:#111118}
+    @media(max-width:640px){.hand-pair{display:none}}
 
-    /* Playing card decorations in corners */
-    .card-corner {
-      position:absolute; z-index:0; pointer-events:none;
-      width:80px; height:110px;
-      background:rgba(255,255,255,0.025);
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:8px;
-      display:flex; align-items:center; justify-content:center;
-      font-family:'Playfair Display',serif;
-    }
-    .card-corner.tl { top:90px; left:2rem; transform:rotate(-12deg); }
-    .card-corner.tr { top:90px; right:2rem; transform:rotate(12deg); }
-    .card-corner.bl { bottom:80px; left:3rem; transform:rotate(8deg); opacity:0.5; }
-    .card-corner.br { bottom:80px; right:3rem; transform:rotate(-8deg); opacity:0.5; }
-    .cc-suit { font-size:2.2rem; }
-    .cc-suit.red { color:rgba(220,50,50,0.5); }
-    .cc-suit.blk { color:rgba(200,200,220,0.4); }
-    @media(max-width:640px){ .card-corner { display:none; } }
+    /* FLOAT SUITS */
+    .float-suits{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .fs{position:absolute;opacity:0.025;animation:rise linear infinite;user-select:none;font-weight:900}
+    @keyframes rise{from{transform:translateY(110vh) rotate(0deg)}to{transform:translateY(-20vh) rotate(360deg)}}
 
-    .hero-inner { position:relative; z-index:1; max-width:780px; }
-    .eyebrow {
-      display:inline-flex; align-items:center; gap:0.5rem;
-      font-size:0.68rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:600;
-      background:rgba(245,200,66,0.07); border:1px solid rgba(245,200,66,0.2);
-      padding:0.4rem 1.2rem; border-radius:20px; margin-bottom:1.5rem;
-    }
-    h1.hero-title {
-      font-family:'Playfair Display',serif; font-size:clamp(2.8rem,7vw,5.2rem); font-weight:900; line-height:1.05;
-      color:#fff; text-shadow:0 4px 40px rgba(0,0,0,0.6); margin-bottom:0.75rem;
-    }
-    h1.hero-title em {
-      font-style:italic;
-      background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .hero-next { font-size:0.95rem; color:var(--dim); margin-bottom:2.5rem; font-weight:300; }
-    .hero-next strong { color:var(--text); font-weight:600; }
+    .hero-inner{position:relative;z-index:1;max-width:800px;width:100%}
+    .eyebrow{display:inline-flex;align-items:center;gap:0.6rem;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold2);margin-bottom:1rem;font-family:'JetBrains Mono',monospace}
+    .eyebrow::before,.eyebrow::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(245,200,66,0.4))}
+    .eyebrow::after{background:linear-gradient(to left,transparent,rgba(245,200,66,0.4))}
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.6rem,6vw,4.4rem);font-weight:900;line-height:1.05;color:#fff;text-shadow:0 0 40px rgba(245,200,66,0.25)}
+    .hero h1 span{color:var(--gold)}
+    .hero-sub{font-size:0.95rem;color:var(--dim);margin-top:0.6rem;letter-spacing:0.04em}
 
-    /* countdown */
-    .cd-label { font-size:0.62rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--dim); margin-bottom:1rem; font-weight:600; }
-    .countdown {
-      display:inline-flex; align-items:center; gap:0.4rem;
-      background:rgba(10,61,31,0.25); border:1px solid rgba(245,200,66,0.18);
-      border-radius:var(--r); padding:1.5rem 2rem; margin-bottom:2.5rem;
-      box-shadow:0 0 60px rgba(245,200,66,0.06), inset 0 1px 0 rgba(255,255,255,0.05);
-    }
-    .cd-unit  { text-align:center; min-width:76px; }
-    .cd-num   { font-family:'JetBrains Mono',monospace; font-size:clamp(2rem,5vw,3.5rem); font-weight:700; color:#fff; line-height:1; text-shadow:0 0 30px rgba(245,200,66,0.4); }
-    .cd-u     { font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim); margin-top:5px; }
-    .cd-sep   { font-family:'JetBrains Mono',monospace; font-size:2.2rem; color:var(--gold2); opacity:0.35; padding-bottom:6px; animation:blink 1s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:.35} 50%{opacity:.08} }
+    /* COUNTDOWN */
+    .cd-wrap{margin:2rem 0 0}
+    .cd-label{font-size:0.63rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);margin-bottom:0.6rem}
+    .countdown{display:flex;gap:0.5rem;justify-content:center;align-items:center;flex-wrap:wrap}
+    .cd-unit{background:rgba(8,16,8,0.65);border:1px solid rgba(245,200,66,0.14);border-radius:10px;padding:0.7rem 0.9rem;min-width:70px;text-align:center;backdrop-filter:blur(6px)}
+    .cd-num{font-family:'JetBrains Mono',monospace;font-size:2.1rem;font-weight:700;color:var(--gold);line-height:1;display:block}
+    .cd-lbl{font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-top:4px;display:block}
+    .cd-sep{font-size:1.9rem;color:rgba(245,200,66,0.28);font-weight:300;line-height:1;padding-bottom:0.5rem}
 
-    /* hero stats strip */
-    .hero-strip { display:flex; align-items:center; justify-content:center; gap:2rem; flex-wrap:wrap; }
-    .hs-item  { text-align:center; }
-    .hs-val   { font-family:'JetBrains Mono',monospace; font-size:1.3rem; font-weight:700; color:var(--gold); }
-    .hs-key   { font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); margin-top:2px; }
-    .hs-sep   { width:1px; height:32px; background:rgba(255,255,255,0.07); }
+    /* HERO RSVP BAR */
+    .hero-rsvp-bar{display:inline-flex;align-items:stretch;margin-top:1.8rem;background:rgba(5,12,5,0.7);backdrop-filter:blur(14px);border:1px solid rgba(245,200,66,0.15);border-radius:50px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.4)}
+    .hrb-item{display:flex;flex-direction:column;align-items:center;padding:0.7rem 1.5rem;gap:3px}
+    .hrb-num{font-family:'JetBrains Mono',monospace;font-size:1.6rem;font-weight:700;line-height:1;transition:all 0.3s}
+    .hrb-num.g{color:var(--green)}
+    .hrb-num.y{color:var(--gold)}
+    .hrb-num.r{color:var(--red)}
+    .hrb-num.d{color:var(--dim)}
+    .hrb-lbl{font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim)}
+    .hrb-div{width:1px;background:rgba(245,200,66,0.1);margin:0.35rem 0}
+    .hrb-cta{font-size:0.63rem;color:var(--dim);text-align:center;margin-top:0.7rem;letter-spacing:0.04em}
+    .hrb-cta a{color:var(--gold2);text-decoration:none}
+    .hrb-cta a:hover{color:var(--gold);text-decoration:underline}
 
-    /* scroll hint */
-    .scroll-hint { position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%); color:var(--faint); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; display:flex; flex-direction:column; align-items:center; gap:4px; }
-    .scroll-hint span { animation:bounce2 2s ease-in-out infinite; font-size:1rem; }
-    @keyframes bounce2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
-
-    /* ── ANNOUNCEMENTS ── */
-    #announcements { position:relative; z-index:10; }
-    .announce-bar {
-      display:flex; align-items:center; gap:0.75rem;
-      padding:0.9rem 2rem; font-size:0.85rem; font-weight:500;
-      border-bottom:1px solid rgba(255,255,255,0.04);
-    }
-    .announce-bar .ann-icon { font-size:1.1rem; flex-shrink:0; }
-    .announce-bar.ann-special { background:rgba(245,200,66,0.08); border-top:2px solid rgba(245,200,66,0.35); color:var(--gold3); }
-    .announce-bar.ann-info    { background:rgba(59,130,246,0.08); border-top:2px solid rgba(59,130,246,0.4); color:#93c5fd; }
-    .announce-bar.ann-warning { background:rgba(239,68,68,0.08);  border-top:2px solid rgba(239,68,68,0.4);  color:#fca5a5; }
+    /* HERO STRIP */
+    .hero-strip{position:relative;z-index:1;width:100%;max-width:720px;margin:2rem auto 0;display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap}
+    .hs-pill{background:rgba(8,16,8,0.5);border:1px solid rgba(245,200,66,0.1);border-radius:8px;padding:0.45rem 0.9rem;font-size:0.74rem;color:var(--dim)}
+    .hs-pill strong{color:var(--text)}
+    .hs-pill.gold{border-color:rgba(245,200,66,0.22);background:rgba(245,200,66,0.05)}
+    .hs-pill.gold strong{color:var(--gold)}
 
     /* ── RSVP SECTION ── */
-    #rsvp { background:var(--dark2); border-top:1px solid rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.04); }
-    #rsvp .section-inner { max-width:1120px; margin:0 auto; padding:4rem 2rem; }
-    .rsvp-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem; }
-    .rsvp-legend { display:flex; align-items:center; gap:1.25rem; font-size:0.75rem; color:var(--dim); flex-wrap:wrap; }
-    .leg-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
-    .leg-in  .leg-dot { background:var(--green); }
-    .leg-out .leg-dot { background:var(--red); }
-    .leg-tbd .leg-dot { background:var(--faint); }
+    .rsvp-section{background:var(--dark2);border-top:1px solid rgba(245,200,66,0.08);padding:3rem 1.5rem 4rem}
+    .rsvp-inner{max-width:1300px;margin:0 auto}
+    .rsvp-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
+    .rsvp-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:0.05em}
+    .rsvp-sub{font-size:0.78rem;color:var(--dim);margin-top:0.3rem}
+    .name-picker-bar{display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:0.85rem 1.2rem;background:rgba(245,200,66,0.03);border:1px solid rgba(245,200,66,0.12);border-radius:10px}
+    .npb-label{font-size:0.78rem;color:var(--dim);white-space:nowrap}
+    #namePicker{background:var(--dark);color:var(--text);border:1px solid rgba(245,200,66,0.22);border-radius:6px;padding:0.4rem 0.75rem;font-size:0.82rem;font-family:'Inter',sans-serif;outline:none;cursor:pointer;min-width:200px}
+    #namePicker:focus{border-color:var(--gold)}
+    .npb-hint{font-size:0.72rem;color:var(--dim);flex:1}
 
-    .rsvp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:0.75rem; }
-    .rsvp-card {
-      display:flex; flex-direction:column; align-items:center; gap:0.4rem;
-      padding:1rem 0.5rem 0.85rem;
-      background:var(--card); border:1px solid rgba(255,255,255,0.06); border-radius:12px;
-      text-align:center; transition:all 0.2s;
-    }
-    .rsvp-card.is-in    { border-color:rgba(34,197,94,0.3);  background:rgba(34,197,94,0.05); }
-    .rsvp-card.is-maybe { border-color:rgba(245,200,66,0.3); background:rgba(245,200,66,0.05); }
-    .rsvp-card.is-out   { border-color:rgba(239,68,68,0.2);  background:rgba(239,68,68,0.04);  opacity:0.65; }
-    .rsvp-card.is-me    { outline:2px solid var(--gold); outline-offset:2px; }
-    .rsvp-name          { font-size:0.83rem; font-weight:700; margin-top:2px; }
-    .rsvp-status        { font-size:0.63rem; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; }
-    .rsvp-card.is-in    .rsvp-status { color:var(--green); }
-    .rsvp-card.is-maybe .rsvp-status { color:var(--gold);  }
-    .rsvp-card.is-out   .rsvp-status { color:var(--red);   }
-    .rsvp-card.is-tbd   .rsvp-status { color:var(--faint); }
-    .rsvp-counts { margin-top:1.5rem; display:flex; gap:1.5rem; font-size:0.82rem; color:var(--dim); flex-wrap:wrap; }
-    .rsvp-counts strong { font-family:'JetBrains Mono',monospace; }
-    .rsvp-counts .cin   { color:var(--green); }
-    .rsvp-counts .cout  { color:var(--red); }
-    .name-picker-wrap   { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem; flex-wrap:wrap; }
-    .name-picker-label  { font-size:0.75rem; color:var(--dim); white-space:nowrap; }
+    /* LAYOUT: grid left, sidebar right */
+    .rsvp-layout{display:grid;grid-template-columns:1fr 280px;gap:1.8rem;align-items:start}
+    @media(max-width:860px){.rsvp-layout{grid-template-columns:1fr}}
 
-    /* Status toggle buttons (only on your own card) */
-    .status-btns { display:flex; gap:4px; margin-top:7px; justify-content:center; flex-wrap:wrap; width:100%; }
-    .sbtn {
-      font-size:0.59rem; font-weight:700; letter-spacing:0.05em; padding:4px 9px;
-      border-radius:20px; border:1px solid rgba(255,255,255,0.1);
-      background:rgba(255,255,255,0.05); color:var(--dim); cursor:pointer;
-      transition:all 0.15s; font-family:'Inter',sans-serif; white-space:nowrap;
-    }
-    .sbtn:hover          { background:rgba(255,255,255,0.1); color:var(--text); }
-    .sbtn.active-in      { background:rgba(34,197,94,0.18);  border-color:rgba(34,197,94,0.5);  color:var(--green); }
-    .sbtn.active-maybe   { background:rgba(245,200,66,0.18); border-color:rgba(245,200,66,0.5); color:var(--gold);  }
-    .sbtn.active-out     { background:rgba(239,68,68,0.18);  border-color:rgba(239,68,68,0.5);  color:var(--red);   }
+    /* DONUT SIDEBAR */
+    .donut-sidebar{position:sticky;top:68px}
+    .donut-card{background:rgba(8,8,20,0.7);border:1px solid rgba(245,200,66,0.12);border-radius:16px;padding:1.5rem;text-align:center;backdrop-filter:blur(10px)}
+    .dc-title{font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--dim);margin-bottom:1.2rem}
+    .donut-wrap{position:relative;width:150px;height:150px;margin:0 auto 1.4rem}
+    .donut-ring{width:150px;height:150px;border-radius:50%;background:conic-gradient(var(--faint) 0deg 360deg);transition:background 0.5s ease;box-shadow:0 0 0 3px rgba(245,200,66,0.1),0 6px 28px rgba(0,0,0,0.6)}
+    .donut-hole{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:82px;height:82px;background:var(--dark2);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid rgba(245,200,66,0.08)}
+    .dn-num{font-family:'JetBrains Mono',monospace;font-size:1.9rem;font-weight:700;color:var(--green);line-height:1;transition:all 0.3s}
+    .dn-lbl{font-size:0.45rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+    .donut-legend{display:flex;flex-direction:column;gap:0.65rem;text-align:left}
+    .dl-row{display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--dim)}
+    .dl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .dl-row strong{margin-left:auto;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.88rem;transition:all 0.3s}
+    @keyframes numFlash{0%{transform:scale(1)}35%{transform:scale(1.5);color:#fff}100%{transform:scale(1)}}
+    .flash{animation:numFlash 0.45s ease}
 
-    /* ── GENERIC SECTION ── */
-    .section      { padding:4.5rem 2rem; max-width:1120px; margin:0 auto; }
-    .sec-eye      { font-size:0.62rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:0.4rem; }
-    .sec-title    { font-family:'Playfair Display',serif; font-size:clamp(1.6rem,3vw,2.1rem); font-weight:700; color:#fff; }
-    .sec-title .dim { color:var(--dim); font-weight:400; font-size:0.8em; }
-    .sec-bar      { width:40px; height:3px; background:linear-gradient(90deg,var(--gold),transparent); border-radius:2px; margin-top:0.85rem; margin-bottom:2rem; }
+    /* PLAYER GRID */
+    #rsvp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.6rem}
+    .rsvp-card{background:var(--card);border:1px solid rgba(245,200,66,0.07);border-radius:12px;padding:0.85rem 0.6rem 0.7rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.45rem;transition:border-color 0.3s,box-shadow 0.3s,background 0.3s;position:relative}
+    .rsvp-card.is-me{border-color:rgba(245,200,66,0.38);box-shadow:0 0 0 1px rgba(245,200,66,0.12),0 4px 16px rgba(245,200,66,0.06)}
+    .rsvp-card.status-in{border-left:3px solid var(--green);background:rgba(34,197,94,0.04)}
+    .rsvp-card.status-maybe{border-left:3px solid var(--gold);background:rgba(245,200,66,0.04)}
+    .rsvp-card.status-out{border-left:3px solid var(--red);background:rgba(239,68,68,0.04)}
+    .rc-name{font-size:0.8rem;font-weight:600;line-height:1.2}
+    .rc-badge{font-size:0.65rem;font-weight:600;letter-spacing:0.04em;padding:2px 9px;border-radius:10px}
+    .rc-badge.sin{background:rgba(34,197,94,0.14);color:#4ade80;border:1px solid rgba(34,197,94,0.25)}
+    .rc-badge.smb{background:rgba(245,200,66,0.12);color:var(--gold);border:1px solid rgba(245,200,66,0.25)}
+    .rc-badge.sout{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25)}
+    .rc-badge.stbd{background:rgba(90,90,120,0.14);color:var(--dim);border:1px solid rgba(90,90,120,0.2)}
+    .rsvp-btns{display:flex;gap:0.3rem;width:100%;margin-top:0.1rem}
+    .rsvp-btns button{flex:1;padding:0.3rem 0.1rem;border:1px solid var(--faint);border-radius:6px;background:transparent;color:var(--dim);font-size:0.62rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em;min-width:0}
+    .rsvp-btns button:hover{border-color:var(--gold);color:var(--gold)}
+    .rsvp-btns button.a-in{border-color:var(--green)!important;background:rgba(34,197,94,0.14)!important;color:#4ade80!important;font-weight:600}
+    .rsvp-btns button.a-mb{border-color:var(--gold)!important;background:rgba(245,200,66,0.1)!important;color:var(--gold)!important;font-weight:600}
+    .rsvp-btns button.a-out{border-color:var(--red)!important;background:rgba(239,68,68,0.1)!important;color:#f87171!important;font-weight:600}
 
-    /* ── STANDINGS — Poker table wrapper ── */
-    .poker-tbl-wrap {
-      border-radius:18px; overflow:hidden;
-      border:6px solid var(--wood);
-      box-shadow:0 0 0 2px rgba(245,200,66,0.08), 0 0 0 3px var(--wood2), 0 20px 60px rgba(0,0,0,0.65), inset 0 0 30px rgba(0,0,0,0.3);
-    }
-    .felt-bar {
-      background:linear-gradient(135deg, #0c4a23, #083518 60%, #0a3d1f);
-      padding:1rem 1.5rem;
-      border-bottom:2px solid rgba(245,200,66,0.18);
-      display:flex; align-items:center; gap:0.75rem;
-      font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:rgba(245,200,66,0.7); font-weight:600;
-    }
-    .felt-bar .fb-suit { font-size:1rem; color:rgba(245,200,66,0.5); }
-    .notice { display:flex; align-items:center; gap:0.5rem; background:rgba(245,200,66,0.05); border:1px solid rgba(245,200,66,0.18); border-radius:8px; padding:0.6rem 1rem; font-size:0.76rem; color:rgba(245,200,66,0.65); margin-bottom:1.25rem; }
-    .tbl-wrap { background:var(--card); overflow:hidden; }
-    table { width:100%; border-collapse:collapse; }
-    thead th { padding:0.8rem 1rem; text-align:left; font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--faint); font-weight:600; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); }
-    tbody tr { border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s; }
-    tbody tr:last-child { border-bottom:none; }
-    tbody tr:hover { background:rgba(255,255,255,0.025); }
-    tbody tr.me { background:rgba(245,200,66,0.04); }
-    tbody tr.me:hover { background:rgba(245,200,66,0.07); }
-    td { padding:0.8rem 1rem; font-size:0.875rem; vertical-align:middle; }
+    /* ANNOUNCEMENTS */
+    .ann-bar{display:flex;align-items:center;gap:0.8rem;padding:0.85rem 2rem;font-size:0.82rem;font-weight:500}
+    .ann-icon{font-size:1.1rem}
+    .ann-bar.ann-special{background:rgba(245,200,66,0.07);border-top:2px solid rgba(245,200,66,0.3);color:var(--gold3)}
+    .ann-bar.ann-info{background:rgba(59,130,246,0.07);border-top:2px solid rgba(59,130,246,0.35);color:#93c5fd}
+    .ann-bar.ann-warning{background:rgba(239,68,68,0.07);border-top:2px solid rgba(239,68,68,0.35);color:#fca5a5}
 
-    .rk   { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--faint); width:40px; }
-    .rk1  { color:var(--gold); font-weight:700; }
-    .rk2  { color:#cbd5e1; }
-    .rk3  { color:#cd7f32; }
+    /* STATS STRIP */
+    .stats-strip{border-top:1px solid rgba(245,200,66,0.08);padding:2.5rem 2rem;background:var(--dark)}
+    .stats-inner{max-width:900px;margin:0 auto;display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center}
+    .sb{text-align:center;min-width:110px;padding:0 0.5rem}
+    .sb-val{font-family:'JetBrains Mono',monospace;font-size:1.6rem;font-weight:700;color:var(--gold)}
+    .sb-lbl{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-top:5px}
+    .sb.hi .sb-val{color:var(--green)}
 
-    .pc   { display:flex; align-items:center; gap:0.75rem; }
-    .pn   { font-weight:600; font-size:0.88rem; }
-    .pfn  { font-size:0.7rem; color:var(--dim); }
-
-    .pts      { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold); font-size:0.88rem; }
-    .bar-wrap { min-width:90px; padding-right:1rem; }
-    .bar-bg   { background:rgba(255,255,255,0.05); border-radius:3px; height:4px; }
-    .bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--gold2),var(--gold)); }
-    .wbadge   { display:inline-flex; align-items:center; background:rgba(245,200,66,0.1); color:var(--gold); font-size:0.65rem; font-weight:700; padding:2px 7px; border-radius:20px; }
-    .sc       { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--dim); text-align:center; }
-    .avg-g    { color:var(--green); } .avg-m { color:var(--gold); } .avg-l { color:var(--dim); }
-
-    /* ── LAST GAME ── */
-    .lg-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:1.5rem; }
-    @media(max-width:700px){ .lg-grid { grid-template-columns:1fr; } }
-    .lg-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
-    .lg-head { padding:1.2rem 1.5rem; background:linear-gradient(135deg,var(--felt2),var(--felt)); border-bottom:1px solid rgba(245,200,66,0.1); }
-    .lg-head h3 { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--gold); }
-    .lg-head p  { font-size:0.76rem; color:rgba(255,255,255,0.45); margin-top:2px; }
-    .lg-recap   { padding:0.9rem 1.5rem; font-size:0.83rem; color:var(--dim); line-height:1.7; border-bottom:1px solid rgba(255,255,255,0.05); }
-    .res-list   { list-style:none; }
-    .res-row    { display:grid; grid-template-columns:50px 1fr auto auto; align-items:center; gap:0.7rem; padding:0.6rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s; }
-    .res-row:last-child { border-bottom:none; }
-    .res-row.itm { background:rgba(34,197,94,0.03); }
-    .res-row:hover { background:rgba(255,255,255,0.02); }
-    .pb   { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:700; }
-    .pb1  { background:linear-gradient(135deg,#f5c842,#e8a800); color:#000; box-shadow:0 0 14px rgba(245,200,66,0.35); }
-    .pb2  { background:linear-gradient(135deg,#e2e8f0,#94a3b8); color:#000; }
-    .pb3  { background:linear-gradient(135deg,#cd7f32,#a05a1e); color:#fff; }
-    .pbo  { background:rgba(255,255,255,0.06); color:var(--dim); }
-    .rn   { font-weight:600; font-size:0.88rem; }
-    .rp   { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--dim); }
-    .rw   { font-family:'JetBrains Mono',monospace; font-size:0.82rem; font-weight:700; color:var(--green); min-width:45px; text-align:right; }
-
-    /* side info cards */
-    .lg-side { display:flex; flex-direction:column; gap:1rem; }
-    .ic      { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1.2rem 1.5rem; }
-    .ic-lbl  { font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--faint); font-weight:600; margin-bottom:0.5rem; }
-    .ic-val  { font-size:1rem; font-weight:600; }
-    .ic-sub  { font-size:0.78rem; color:var(--dim); margin-top:3px; }
-    .ic-date { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--gold); }
-
-    /* ── SCHEDULE ── */
-    .sched-list { display:flex; flex-direction:column; gap:0.35rem; }
-    .si { display:grid; grid-template-columns:105px 1fr auto; align-items:center; gap:1rem; padding:0.8rem 1.1rem; border-radius:8px; border:1px solid transparent; transition:all 0.2s; }
-    .si.done  { opacity:0.3; }
-    .si.up    { background:rgba(255,255,255,0.02); border-color:rgba(255,255,255,0.05); }
-    .si.nxt   { background:rgba(245,200,66,0.055); border-color:rgba(245,200,66,0.22); }
-    .si.tourn { background:rgba(59,130,246,0.055); border-color:rgba(59,130,246,0.2); }
-    .si.fin   { background:rgba(239,68,68,0.055);  border-color:rgba(239,68,68,0.2); }
-    .si-date  { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--dim); }
-    .si-name  { font-weight:500; font-size:0.88rem; }
-    .si.nxt   .si-name { color:var(--gold); font-weight:700; }
-    .si.tourn .si-name { color:var(--blue); }
-    .si.fin   .si-name { color:var(--red); }
-    .stag { font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; padding:3px 9px; border-radius:20px; font-weight:700; white-space:nowrap; }
-    .t-done  { background:rgba(255,255,255,0.05); color:var(--faint); }
-    .t-nxt   { background:rgba(245,200,66,0.14); color:var(--gold); }
-    .t-tourn { background:rgba(59,130,246,0.14); color:var(--blue); }
-    .t-fin   { background:rgba(239,68,68,0.14);  color:var(--red); }
-    .t-up    { background:rgba(255,255,255,0.05); color:var(--dim); }
-
-    /* ── RECORDS ── */
-    .rec-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; }
-    .rc { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1.5rem; position:relative; overflow:hidden; }
-    .rc::before { content:''; position:absolute; top:-30px; right:-30px; width:90px; height:90px; background:radial-gradient(circle,rgba(245,200,66,0.07) 0%,transparent 70%); }
-    .rc-icon { font-size:1.4rem; margin-bottom:0.65rem; }
-    .rc-lbl  { font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--faint); font-weight:600; margin-bottom:0.4rem; }
-    .rc-val  { font-family:'Playfair Display',serif; font-size:1.45rem; color:var(--gold); line-height:1.2; margin-bottom:3px; }
-    .rc-sub  { font-size:0.76rem; color:var(--dim); }
-
-    /* ── ROSTER — chip cards ── */
-    .roster-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:0.9rem; }
-    .roc {
-      background:var(--card); border:1px solid var(--border); border-radius:var(--r);
-      padding:1.2rem 0.7rem; text-align:center; transition:all 0.25s; cursor:default;
-    }
-    .roc:hover { transform:translateY(-4px); border-color:rgba(245,200,66,0.22); box-shadow:0 12px 30px rgba(0,0,0,0.45); }
-    .ro-chip { margin:0 auto 0.75rem; display:flex; align-items:center; justify-content:center; }
-    .ro-name { font-weight:700; font-size:0.88rem; }
-    .ro-full { font-size:0.68rem; color:var(--dim); margin-top:1px; }
-    .ro-pts  { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--gold); font-weight:700; margin-top:5px; }
-    .ro-rank { font-size:0.62rem; color:var(--faint); margin-top:1px; }
-
-    /* ── CHAMPIONS ── */
-    .champs { display:flex; flex-wrap:wrap; gap:1rem; }
-    .ch { background:var(--card); border:1px solid rgba(245,200,66,0.13); border-radius:var(--r); padding:1.2rem 1.5rem; position:relative; overflow:hidden; min-width:175px; }
-    .ch::after { content:'♛'; position:absolute; right:0.9rem; top:50%; transform:translateY(-50%); font-size:2.8rem; opacity:0.04; pointer-events:none; }
-    .ch-s    { font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); font-weight:600; }
-    .ch-n    { font-family:'Playfair Display',serif; font-size:1.15rem; color:#fff; margin-top:3px; }
-    .ch-note { font-size:0.73rem; color:var(--dim); margin-top:2px; }
-
-    /* ── FOOTER ── */
-    footer { text-align:center; padding:3rem 2rem; color:var(--faint); font-size:0.73rem; border-top:1px solid rgba(255,255,255,0.05); margin-top:2rem; }
-    footer a { color:var(--dim); text-decoration:none; }
-    footer a:hover { color:var(--gold); }
-    .f-suits { font-size:1rem; letter-spacing:0.5rem; margin-bottom:0.7rem; }
-
-    /* ── ARCHIVES ── */
-    .arch-controls { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:2rem; }
-    .arch-select {
-      appearance:none; -webkit-appearance:none;
-      background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 1rem center;
-      border:1px solid rgba(245,200,66,0.18); border-radius:8px;
-      color:var(--text); font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:500;
-      padding:0.65rem 2.5rem 0.65rem 1rem; cursor:pointer; min-width:200px; transition:border-color 0.2s;
-    }
-    .arch-select:hover { border-color:rgba(245,200,66,0.4); }
-    .arch-select:focus { outline:none; border-color:var(--gold); }
-    .arch-select option { background:#111122; }
-    .arch-arrow { color:var(--faint); font-size:1.2rem; padding:0 0.25rem; user-select:none; }
-    .arch-panel { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:2rem; min-height:180px; }
-    .arch-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:150px; text-align:center; gap:0.5rem; color:var(--faint); font-size:0.88rem; }
-    .arch-placeholder .big { font-size:2rem; margin-bottom:0.3rem; }
-    .arch-panel h3 { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--gold); margin-bottom:0.25rem; }
-    .arch-panel .arch-meta { font-size:0.76rem; color:var(--dim); margin-bottom:1.25rem; }
-    .arch-panel table { width:100%; border-collapse:collapse; }
-    .arch-panel table th { font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--faint); padding:0.5rem 0.75rem; text-align:left; border-bottom:1px solid rgba(255,255,255,0.06); }
-    .arch-panel table td { padding:0.6rem 0.75rem; font-size:0.85rem; border-bottom:1px solid rgba(255,255,255,0.04); }
-    .arch-panel table tr:last-child td { border-bottom:none; }
-    .arch-panel table tr:hover td { background:rgba(255,255,255,0.02); }
-    .arch-itm td:first-child { border-left:2px solid var(--green); }
-    .arch-w   { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--green); text-align:right; }
-    .arch-pts { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--gold); text-align:right; }
-
-    @media(max-width:640px){
-      .nav-links { display:none; }
-      .countdown { padding:1.2rem 1rem; }
-      .cd-unit   { min-width:58px; }
-      .hide-m    { display:none; }
-      .arch-controls { flex-direction:column; align-items:stretch; }
-      .arch-arrow { display:none; }
-    }
+    /* FOOTER */
+    footer{background:var(--dark2);border-top:1px solid rgba(245,200,66,0.08);padding:2rem;text-align:center}
+    .f-links{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:0.9rem}
+    .f-links a{color:var(--dim);text-decoration:none;font-size:0.76rem;padding:0.3rem 0.75rem;border:1px solid rgba(90,90,120,0.25);border-radius:20px;transition:all 0.2s}
+    .f-links a:hover{color:var(--gold);border-color:rgba(245,200,66,0.3)}
+    .f-links a.special{color:#fbbf24;border-color:rgba(251,191,36,0.3)}
+    .f-credit{font-size:0.63rem;color:var(--faint);letter-spacing:0.08em;margin-top:0.5rem}
   </style>
 </head>
 <body>
 
 <nav>
-  <div class="nav-brand">♠ Tod's Poker League</div>
+  <a href="index.html" class="nav-brand">♠ Tod's Poker League</a>
   <div class="nav-links">
-    <a href="#rsvp">Next Game</a>
-    <a href="#standings">Standings</a>
-    <a href="#last-game">Last Game</a>
-    <a href="#schedule">Schedule</a>
-    <a href="#archives">History</a>
-    <a href="#roster">Roster</a>
+    <a href="index.html" class="active">Home</a>
+    <a href="standings.html">Standings</a>
+    <a href="results.html">Results</a>
+    <a href="schedule.html">Schedule</a>
+    <a href="special.html" class="special">⭐ Mid-Season</a>
+    <a href="roster.html">Roster</a>
   </div>
   <a href="admin.html" class="nav-admin">Admin ⚙</a>
 </nav>
@@ -389,570 +199,365 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="float-suits" id="float-suits"></div>
 
-  <!-- decorative card corners -->
-  <div class="card-corner tl"><div class="cc-suit red">♥</div></div>
-  <div class="card-corner tr"><div class="cc-suit blk">♠</div></div>
-  <div class="card-corner bl"><div class="cc-suit blk">♣</div></div>
-  <div class="card-corner br"><div class="cc-suit red">♦</div></div>
+  <!-- A♦K♦ Big Slick Suited — top left -->
+  <div class="hand-pair" style="top:82px;left:1.5rem;opacity:0.82">
+    <div class="pc rc" data-s="♦" style="transform:rotate(-9deg)">
+      <div class="pc-t"><div class="pc-r">A</div><div class="pc-s">♦</div></div>
+      <div class="pc-b"><div class="pc-r">A</div><div class="pc-s">♦</div></div>
+    </div>
+    <div class="pc rc" data-s="♦" style="transform:rotate(5deg);margin-left:-10px">
+      <div class="pc-t"><div class="pc-r">K</div><div class="pc-s">♦</div></div>
+      <div class="pc-b"><div class="pc-r">K</div><div class="pc-s">♦</div></div>
+    </div>
+  </div>
+
+  <!-- J♠J♥ Pocket Jacks — top right -->
+  <div class="hand-pair" style="top:82px;right:1.5rem;opacity:0.82">
+    <div class="pc bk" data-s="♠" style="transform:rotate(-5deg)">
+      <div class="pc-t"><div class="pc-r">J</div><div class="pc-s">♠</div></div>
+      <div class="pc-b"><div class="pc-r">J</div><div class="pc-s">♠</div></div>
+    </div>
+    <div class="pc rc" data-s="♥" style="transform:rotate(9deg);margin-left:-10px">
+      <div class="pc-t"><div class="pc-r">J</div><div class="pc-s">♥</div></div>
+      <div class="pc-b"><div class="pc-r">J</div><div class="pc-s">♥</div></div>
+    </div>
+  </div>
+
+  <!-- 7♣2♦ The Hammer — bottom left -->
+  <div class="hand-pair" style="bottom:65px;left:2.2rem;opacity:0.52">
+    <div class="pc bk" data-s="♣" style="transform:rotate(8deg)">
+      <div class="pc-t"><div class="pc-r">7</div><div class="pc-s">♣</div></div>
+      <div class="pc-b"><div class="pc-r">7</div><div class="pc-s">♣</div></div>
+    </div>
+    <div class="pc rc" data-s="♦" style="transform:rotate(-5deg);margin-left:-10px">
+      <div class="pc-t"><div class="pc-r">2</div><div class="pc-s">♦</div></div>
+      <div class="pc-b"><div class="pc-r">2</div><div class="pc-s">♦</div></div>
+    </div>
+  </div>
+
+  <!-- 9♥5♦ Dolly Parton — bottom right -->
+  <div class="hand-pair" style="bottom:65px;right:2.2rem;opacity:0.52">
+    <div class="pc rc" data-s="♥" style="transform:rotate(-7deg)">
+      <div class="pc-t"><div class="pc-r">9</div><div class="pc-s">♥</div></div>
+      <div class="pc-b"><div class="pc-r">9</div><div class="pc-s">♥</div></div>
+    </div>
+    <div class="pc rc" data-s="♦" style="transform:rotate(5deg);margin-left:-10px">
+      <div class="pc-t"><div class="pc-r">5</div><div class="pc-s">♦</div></div>
+      <div class="pc-b"><div class="pc-r">5</div><div class="pc-s">♦</div></div>
+    </div>
+  </div>
+
+  <!-- Floating background suits -->
+  <div class="float-suits" id="floatSuits"></div>
 
   <div class="hero-inner">
-    <div class="eyebrow">♠ Season 20 &nbsp;·&nbsp; Peachtree City, GA &nbsp;·&nbsp; 2026</div>
-    <h1 class="hero-title">Tod's<br><em>Poker League</em></h1>
-    <p class="hero-next" id="hero-next">—</p>
+    <div class="eyebrow">Season 20 &nbsp;·&nbsp; Peachtree City, GA &nbsp;·&nbsp; APL Style</div>
+    <h1>Tod's <span>Poker</span> League</h1>
+    <div class="hero-sub" id="nextGameLine">Loading next game...</div>
 
-    <div class="cd-label">Next Game Starts In</div>
-    <div class="countdown">
-      <div class="cd-unit"><div class="cd-num" id="cd-d">--</div><div class="cd-u">Days</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-unit"><div class="cd-num" id="cd-h">--</div><div class="cd-u">Hours</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-unit"><div class="cd-num" id="cd-m">--</div><div class="cd-u">Mins</div></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-unit"><div class="cd-num" id="cd-s">--</div><div class="cd-u">Secs</div></div>
+    <div class="cd-wrap">
+      <div class="cd-label">Next game in</div>
+      <div class="countdown">
+        <div class="cd-unit"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">Days</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">Hours</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">Min</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">Sec</span></div>
+      </div>
     </div>
 
-    <div class="hero-strip" id="hero-strip"></div>
+    <!-- LIVE RSVP COUNT near countdown -->
+    <div class="hero-rsvp-bar">
+      <div class="hrb-item"><span class="hrb-num g" id="h-in">—</span><span class="hrb-lbl">In</span></div>
+      <div class="hrb-div"></div>
+      <div class="hrb-item"><span class="hrb-num y" id="h-maybe">—</span><span class="hrb-lbl">Maybe</span></div>
+      <div class="hrb-div"></div>
+      <div class="hrb-item"><span class="hrb-num r" id="h-out">—</span><span class="hrb-lbl">Out</span></div>
+      <div class="hrb-div"></div>
+      <div class="hrb-item"><span class="hrb-num d" id="h-tbd">—</span><span class="hrb-lbl">No Reply</span></div>
+    </div>
+    <div class="hrb-cta">Tod uses this to plan tables & chips — <a href="#rsvp">update your status below ↓</a></div>
+
+    <div class="hero-strip">
+      <div class="hs-pill">Buy-in: <strong>$20</strong></div>
+      <div class="hs-pill">Events played: <strong id="evPlayed">10 of 15</strong></div>
+      <div class="hs-pill gold">Season Final · <strong>$1,300 bracelet</strong></div>
+      <div class="hs-pill">Leader: <strong id="hLeader">—</strong></div>
+    </div>
   </div>
-  <div class="scroll-hint">Who's In? <span>↓</span></div>
 </section>
 
-<!-- ANNOUNCEMENTS (rendered by JS from data.js) -->
+<!-- RSVP SECTION -->
+<section class="rsvp-section" id="rsvp">
+  <div class="rsvp-inner">
+    <div class="rsvp-head">
+      <div>
+        <div class="rsvp-title">♣ Who's Playing — Event 11</div>
+        <div class="rsvp-sub">Thursday, July 2nd at 8:00 PM · Select your name and set your status so Tod can plan tables & chips</div>
+      </div>
+    </div>
+
+    <div class="name-picker-bar">
+      <span class="npb-label">Who are you?</span>
+      <select id="namePicker" onchange="onNamePick(this.value)">
+        <option value="">— select your name —</option>
+      </select>
+      <span class="npb-hint" id="npbHint">Pick your name, then click In / Maybe / Out on your card</span>
+    </div>
+
+    <div class="rsvp-layout">
+      <!-- PLAYER GRID (left, wide) -->
+      <div id="rsvp-grid"></div>
+
+      <!-- DONUT SIDEBAR (right, sticky) -->
+      <div class="donut-sidebar">
+        <div class="donut-card">
+          <div class="dc-title">Game Status — Event 11</div>
+          <div class="donut-wrap">
+            <div id="rsvp-donut" class="donut-ring"></div>
+            <div class="donut-hole">
+              <div class="dn-num" id="donut-num">0</div>
+              <div class="dn-lbl">confirmed in</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="dl-row">
+              <span class="dl-dot" style="background:#22c55e"></span>
+              <span>Confirmed In</span>
+              <strong id="cnt-in">0</strong>
+            </div>
+            <div class="dl-row">
+              <span class="dl-dot" style="background:#f5c842"></span>
+              <span>Maybe</span>
+              <strong id="cnt-maybe">0</strong>
+            </div>
+            <div class="dl-row">
+              <span class="dl-dot" style="background:#ef4444"></span>
+              <span>Out</span>
+              <strong id="cnt-out">0</strong>
+            </div>
+            <div class="dl-row">
+              <span class="dl-dot" style="background:#3a3a55"></span>
+              <span>No Reply</span>
+              <strong id="cnt-tbd">0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANNOUNCEMENTS -->
 <div id="announcements"></div>
 
-<!-- RSVP / NEXT GAME -->
-<div id="rsvp">
-  <div class="section-inner">
-    <div class="rsvp-header">
-      <div>
-        <div class="sec-eye" style="margin-bottom:0.3rem">♣ Who's Playing Next Game</div>
-        <h2 class="sec-title" id="rsvp-title">Event 11</h2>
-        <p style="font-size:0.8rem;color:var(--dim);margin-top:0.3rem" id="rsvp-subtitle">Pick your name · tap your status · updates live for everyone</p>
-      </div>
-      <div class="rsvp-legend">
-        <span class="leg-in"><span class="leg-dot"></span>In</span>
-        <span style="color:var(--gold)"><span style="background:var(--gold);display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Maybe</span>
-        <span class="leg-out"><span class="leg-dot"></span>Out</span>
-        <span class="leg-tbd"><span class="leg-dot"></span>No Response</span>
-      </div>
-    </div>
-    <div class="name-picker-wrap">
-      <span class="name-picker-label">Who are you?</span>
-      <select class="arch-select" id="name-picker" style="min-width:180px">
-        <option value="">— Tap to identify yourself —</option>
-      </select>
-    </div>
-    <div class="rsvp-grid" id="rsvp-grid"></div>
-    <div class="rsvp-counts" id="rsvp-counts"></div>
-  </div>
-</div>
-
-<!-- STANDINGS -->
-<div id="standings" class="section">
-  <div class="sec-eye">♣ Current Rankings</div>
-  <h2 class="sec-title">Season Standings <span class="dim">— Through Event 10</span></h2>
-  <div class="sec-bar"></div>
-  <div class="notice" id="st-notice"></div>
-  <div class="poker-tbl-wrap">
-    <div class="felt-bar">
-      <span class="fb-suit">♠</span>
-      APL Season 20 — Points determine starting chip stack at Season Final
-      <span class="fb-suit" style="margin-left:auto">♠</span>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th style="width:44px">#</th>
-          <th>Player</th>
-          <th class="hide-m">Events</th>
-          <th>Points</th>
-          <th class="hide-m" style="min-width:90px"></th>
-          <th class="hide-m">Wins</th>
-          <th class="hide-m">Cashes</th>
-          <th>Avg</th>
-        </tr></thead>
-        <tbody id="st-body"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- LAST GAME (shown for 4 days after game) -->
-<div id="last-game" class="section" style="display:none">
-  <div class="sec-eye">♦ Most Recent Results</div>
-  <h2 class="sec-title" id="lg-title2">Last Game</h2>
-  <div class="sec-bar"></div>
-  <div class="lg-grid">
-    <div class="lg-card">
-      <div class="lg-head"><h3 id="lg-h3"></h3><p id="lg-meta"></p></div>
-      <div class="lg-recap" id="lg-recap"></div>
-      <ul class="res-list" id="res-list"></ul>
-    </div>
-    <div class="lg-side" id="lg-side"></div>
-  </div>
-</div>
-
-<!-- SCHEDULE -->
-<div id="schedule" class="section">
-  <div class="sec-eye">♥ Season Calendar</div>
-  <h2 class="sec-title">2026 Schedule</h2>
-  <div class="sec-bar"></div>
-  <div class="sched-list" id="sched-list"></div>
-</div>
-
-<!-- RECORDS -->
-<div class="section" style="background:var(--dark2);max-width:100%;padding:4.5rem 2rem">
-  <div style="max-width:1120px;margin:0 auto">
-    <div class="sec-eye">♠ All-Time</div>
-    <h2 class="sec-title">League Records</h2>
-    <div class="sec-bar"></div>
-    <div class="rec-grid" id="rec-grid"></div>
-  </div>
-</div>
-
-<!-- ROSTER -->
-<div id="roster" class="section">
-  <div class="sec-eye">♣ The Field</div>
-  <h2 class="sec-title">Player Roster</h2>
-  <div class="sec-bar"></div>
-  <div class="roster-grid" id="roster-grid"></div>
-</div>
-
-<!-- CHAMPIONS -->
-<div class="section" style="background:var(--dark2);max-width:100%;padding:4.5rem 2rem">
-  <div style="max-width:1120px;margin:0 auto">
-    <div class="sec-eye">♦ Hall of Champions</div>
-    <h2 class="sec-title">Past Season Winners</h2>
-    <div class="sec-bar"></div>
-    <div class="champs" id="champs"></div>
-  </div>
-</div>
-
-<!-- ARCHIVES -->
-<div id="archives" class="section">
-  <div class="sec-eye">♠ Browse History</div>
-  <h2 class="sec-title">Season &amp; Game Archive</h2>
-  <div class="sec-bar"></div>
-  <div class="arch-controls">
-    <select class="arch-select" id="arch-season" aria-label="Select season">
-      <option value="">— Select a Season —</option>
-    </select>
-    <span class="arch-arrow">›</span>
-    <select class="arch-select" id="arch-event" disabled aria-label="Select event">
-      <option value="">— Select an Event —</option>
-    </select>
-  </div>
-  <div class="arch-panel" id="arch-panel">
-    <div class="arch-placeholder">
-      <div class="big">♠♥♦♣</div>
-      <div>Pick a season and event above to view results</div>
-    </div>
-  </div>
-</div>
+<!-- SEASON STATS -->
+<section class="stats-strip">
+  <div class="stats-inner" id="statsInner"></div>
+</section>
 
 <footer>
-  <div class="f-suits">♠ ♥ ♦ ♣</div>
-  <p>Tod's Poker League &nbsp;·&nbsp; Peachtree City, GA &nbsp;·&nbsp; Season 20</p>
-  <p style="margin-top:0.5rem"><a href="admin.html">Admin</a></p>
+  <div class="f-links">
+    <a href="index.html">Home</a>
+    <a href="standings.html">Standings</a>
+    <a href="results.html">Results</a>
+    <a href="schedule.html">Schedule</a>
+    <a href="special.html" class="special">⭐ Mid-Season</a>
+    <a href="roster.html">Roster</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="f-credit">TOD'S POKER LEAGUE · SEASON 20 · PEACHTREE CITY, GA</div>
 </footer>
 
 <script>
-// ── SAFE DATE PARSE ──
-function parseLocalDate(str, hour) {
-  const [y,m,d] = str.split('-').map(Number);
-  return new Date(y, m-1, d, hour||0, 0, 0);
-}
+var L=LEAGUE,ng=L.nextGame;
 
-// ── POKER CHIP COLORS — 10 unique chips, one per player slot ──
-const CHIP_COLORS=[
-  {bg:'#dc2626',rim:'#7f1d1d'},  // red
-  {bg:'#2563eb',rim:'#1e3a8a'},  // blue
-  {bg:'#16a34a',rim:'#14532d'},  // green
-  {bg:'#7c3aed',rim:'#4c1d95'},  // purple
-  {bg:'#d97706',rim:'#78350f'},  // amber
-  {bg:'#0891b2',rim:'#164e63'},  // cyan
-  {bg:'#db2777',rim:'#831843'},  // pink
-  {bg:'#ea580c',rim:'#7c2d12'},  // orange
-  {bg:'#4f46e5',rim:'#312e81'},  // indigo
-  {bg:'#0d9488',rim:'#134e4a'},  // teal
+// ── CHIP COLORS ──
+var CHIP_COLORS=[
+  {bg:'#dc2626',rim:'#7f1d1d'},{bg:'#2563eb',rim:'#1e3a8a'},{bg:'#16a34a',rim:'#14532d'},
+  {bg:'#7c3aed',rim:'#4c1d95'},{bg:'#d97706',rim:'#78350f'},{bg:'#0891b2',rim:'#164e63'},
+  {bg:'#db2777',rim:'#831843'},{bg:'#ea580c',rim:'#7c2d12'},{bg:'#4f46e5',rim:'#312e81'},
+  {bg:'#0d9488',rim:'#134e4a'}
 ];
-
-// Renders a poker chip avatar element (inline style, no extra CSS class needed)
-function playerChip(p, i, size) {
-  size = size || 44;
-  var c = CHIP_COLORS[i % CHIP_COLORS.length];
-  var inner = Math.round(size * 0.62);
-  var emojiSize = Math.round(inner * 0.55);
-  var suits = ['♠','♥','♦','♣'];
-  var emoji = suits[i % 4];
-  var face = p.avatar
-    ? '<img src="'+p.avatar+'" style="width:'+inner+'px;height:'+inner+'px;object-fit:cover;border-radius:50%;border:1.5px solid rgba(255,255,255,0.35)" alt="'+p.name+'">'
-    : '<span style="font-size:'+emojiSize+'px;text-shadow:0 1px 3px rgba(0,0,0,0.7);line-height:1">'+emoji+'</span>';
+function playerChip(p,i,size){
+  size=size||44;
+  var c=CHIP_COLORS[i%CHIP_COLORS.length];
+  var inner=Math.round(size*0.62);
+  var es=Math.round(inner*0.55);
+  var suits=['♠','♥','♦','♣'];
+  var face=p.avatar
+    ?'<img src="'+p.avatar+'" style="width:'+inner+'px;height:'+inner+'px;object-fit:cover;border-radius:50%;border:1.5px solid rgba(255,255,255,0.35)" alt="'+p.name+'">'
+    :'<span style="font-size:'+es+'px;text-shadow:0 1px 3px rgba(0,0,0,0.7);line-height:1">'+suits[i%4]+'</span>';
   return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,'+c.bg+' 54%,transparent 54%),repeating-conic-gradient('+c.rim+' 0deg 20deg,rgba(255,255,255,0.65) 20deg 40deg);box-shadow:0 0 0 1.5px '+c.rim+',0 3px 10px rgba(0,0,0,0.55)">'+face+'</div>';
 }
 
+// ── NEXT GAME LINE ──
+(function(){
+  var mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var dy=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var p=ng.date.split('-').map(Number);
+  var d=new Date(p[0],p[1]-1,p[2],20,0,0);
+  var el=document.getElementById('nextGameLine');
+  if(el)el.textContent='Event 11 · '+dy[d.getDay()]+', '+mo[d.getMonth()]+' '+d.getDate()+', '+p[0]+' at '+ng.time;
+  var hl=document.getElementById('hLeader');
+  if(hl&&L.standings&&L.standings.length)hl.textContent=L.standings[0].name+' ('+L.standings[0].points.toLocaleString()+' pts)';
+  var ep=document.getElementById('evPlayed');
+  if(ep){var done=(L.schedule||[]).filter(function(e){return e.completed;}).length;ep.textContent=done+' of '+(L.schedule||[]).length;}
+})();
+
 // ── FLOATING SUITS ──
-;(function(){
-  var suits=['♠','♥','♦','♣'], c=document.getElementById('float-suits');
-  for(var i=0;i<18;i++){
-    var el=document.createElement('div'); el.className='fs';
-    el.textContent=suits[i%4];
-    el.style.left=(Math.random()*100)+'vw';
-    el.style.animationDuration=(18+Math.random()*24)+'s';
-    el.style.animationDelay=(-Math.random()*35)+'s';
-    el.style.fontSize=(3+Math.random()*6)+'rem';
-    el.style.color=(i%4===0||i%4===3)?'rgba(255,255,255,0.8)':'rgba(220,40,40,0.8)';
+(function(){
+  var s=['♠','♥','♦','♣'],c=document.getElementById('floatSuits');
+  if(!c)return;
+  for(var i=0;i<10;i++){
+    var el=document.createElement('span');
+    el.className='fs';el.textContent=s[i%4];
+    el.style.left=Math.random()*100+'%';
+    el.style.fontSize=(1.2+Math.random()*3)+'rem';
+    el.style.animationDuration=(14+Math.random()*22)+'s';
+    el.style.animationDelay='-'+(Math.random()*25)+'s';
     c.appendChild(el);
   }
 })();
 
 // ── COUNTDOWN ──
-function pad(n){ return String(Math.max(0,n)).padStart(2,'0'); }
+function pld(str,h){var p=str.split('-').map(Number);return new Date(p[0],p[1]-1,p[2],h||0,0,0);}
+function pad(n){return n<10?'0'+n:String(n);}
 function tick(){
-  var ng=LEAGUE.nextGame;
-  var target=parseLocalDate(ng.date,20);
-  var diff=target-Date.now();
-  document.getElementById('cd-d').textContent=pad(Math.floor(diff/86400000));
-  document.getElementById('cd-h').textContent=pad(Math.floor(diff%86400000/3600000));
-  document.getElementById('cd-m').textContent=pad(Math.floor(diff%3600000/60000));
-  document.getElementById('cd-s').textContent=pad(Math.floor(diff%60000/1000));
+  var diff=pld(ng.date,20)-new Date();
+  if(diff<=0){['cd-d','cd-h','cd-m','cd-s'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent='00';});return;}
+  var e=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  e('cd-d',pad(Math.floor(diff/86400000)));
+  e('cd-h',pad(Math.floor(diff%86400000/3600000)));
+  e('cd-m',pad(Math.floor(diff%3600000/60000)));
+  e('cd-s',pad(Math.floor(diff%60000/1000)));
+}
+tick();setInterval(tick,1000);
+
+// ── NAME PICKER ──
+var myName='';
+(function(){
+  var sel=document.getElementById('namePicker');
+  if(!sel)return;
+  var saved='';try{saved=localStorage.getItem('tpl_myname')||'';}catch(e){}
+  L.standings.forEach(function(p){
+    var o=document.createElement('option');
+    o.value=p.name;o.textContent=p.name+(p.fullName&&p.fullName!==p.name?' ('+p.fullName+')':'');
+    if(p.name===saved)o.selected=true;
+    sel.appendChild(o);
+  });
+  if(saved){myName=saved;}
+})();
+function onNamePick(v){
+  myName=v;try{localStorage.setItem('tpl_myname',v);}catch(e){}
+  var h=document.getElementById('npbHint');
+  if(h)h.textContent=v?'Click In, Maybe, or Out on your card below.':'Pick your name, then click In / Maybe / Out on your card';
+  buildRsvpGrid();
 }
 
-document.addEventListener('DOMContentLoaded',function(){
-  var L=LEAGUE;
-  var ng=L.nextGame;
-  var sorted=[].concat(L.standings).sort(function(a,b){return b.points-a.points;});
-  var maxPts=sorted[0].points;
-  var today=new Date();
-
-  // Hero next game text
-  var ngDate=parseLocalDate(ng.date,20);
-  document.getElementById('hero-next').innerHTML=
-    'Next: <strong>'+ngDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+' at '+(ng.time||'8:00 PM')+'</strong>';
-
-  // Hero strip
-  var evDone=L.schedule.filter(function(e){return e.completed;}).length;
-  document.getElementById('hero-strip').innerHTML=
-    '<div class="hs-item"><div class="hs-val">$40</div><div class="hs-key">Buy-In</div></div>'+
-    '<div class="hs-sep"></div>'+
-    '<div class="hs-item"><div class="hs-val">+$40</div><div class="hs-key">Optional Rebuy</div></div>'+
-    '<div class="hs-sep"></div>'+
-    '<div class="hs-item"><div class="hs-val">'+sorted.length+'</div><div class="hs-key">Players</div></div>'+
-    '<div class="hs-sep"></div>'+
-    '<div class="hs-item"><div class="hs-val">'+evDone+'/'+L.schedule.length+'</div><div class="hs-key">Events Played</div></div>';
-
-  // Countdown
-  tick(); setInterval(tick,1000);
-
-  // ── ANNOUNCEMENTS ──
-  var annDiv=document.getElementById('announcements');
-  (L.announcements||[]).filter(function(a){return a.active;}).forEach(function(a){
-    var bar=document.createElement('div');
-    bar.className='announce-bar ann-'+a.type;
-    bar.innerHTML='<span class="ann-icon">'+(a.icon||'📢')+'</span><span>'+a.text+'</span>';
-    annDiv.appendChild(bar);
-  });
-
-  // ── RSVP — Firebase live toggling ──
-  var nextEv=L.schedule.find(function(e){return !e.completed;});
-  document.getElementById('rsvp-title').textContent=nextEv?nextEv.label:'Next Game';
-  document.getElementById('rsvp-subtitle').textContent=
-    ngDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+
-    ' at '+(ng.time||'8:00 PM')+' · Pick your name, then tap your status';
-
-  var myName=localStorage.getItem('tpl_myname')||'';
-  var activePlayers=sorted.filter(function(p){return p.events>0;});
-  var picker=document.getElementById('name-picker');
-  activePlayers.forEach(function(p){
-    var opt=document.createElement('option');
-    opt.value=p.name;
-    opt.textContent=p.name+(p.fullName?' ('+p.fullName+')':'');
-    if(p.name===myName) opt.selected=true;
-    picker.appendChild(opt);
-  });
-
-  // Firebase key tied to next game date — auto-resets each event
-  var fbKey='rsvp_'+ng.date.replace(/-/g,'_');
-  var fbStatuses={};
-  var fbLive=false; // true once Firebase is connected
-
-  // ── Load statuses: Firebase if configured, else localStorage ──
-  function loadLocalStatuses(){
-    try{ var s=localStorage.getItem('tpl_rsvp_'+fbKey); fbStatuses=s?JSON.parse(s):{}; }
-    catch(e){ fbStatuses={}; }
-  }
-
-  function setStatus(status){
-    if(!myName) return;
-    if(fbLive){
-      // Firebase path — updates all devices in real time
-      try { firebase.database().ref(fbKey+'/'+myName).set(status); }
-      catch(e){ console.warn('Firebase write:',e.message); }
-    } else {
-      // Local fallback — saves to this browser until Firebase is set up
-      fbStatuses[myName]=status;
-      try{ localStorage.setItem('tpl_rsvp_'+fbKey,JSON.stringify(fbStatuses)); }catch(e){}
-      buildRsvpGrid(); // re-render immediately so button lights up
-    }
-  }
-  window.setStatus=setStatus;
-
-  function buildRsvpGrid(){
-    var rg=document.getElementById('rsvp-grid');
-    rg.innerHTML='';
-    var inC=0, maybeC=0, outC=0;
-    activePlayers.forEach(function(p,i){
-      var st=fbStatuses[p.name]||'tbd';
-      if(st==='in') inC++; else if(st==='maybe') maybeC++; else if(st==='out') outC++;
-      var isMe=p.name===myName;
-      var statusLabel=st==='in'?'✓ In':st==='out'?'✗ Out':st==='maybe'?'? Maybe':'— TBD';
-      var div=document.createElement('div');
-      div.className='rsvp-card is-'+st+(isMe?' is-me':'');
-      var btnHtml=isMe?
-        '<div class="status-btns">'+
-          '<button class="sbtn '+(st==='in'?'active-in':'')+'" onclick="setStatus(\'in\')">✓ In</button>'+
-          '<button class="sbtn '+(st==='maybe'?'active-maybe':'')+'" onclick="setStatus(\'maybe\')">? Maybe</button>'+
-          '<button class="sbtn '+(st==='out'?'active-out':'')+'" onclick="setStatus(\'out\')">✗ Out</button>'+
-        '</div>':'';
-      div.innerHTML=
-        playerChip(p,i,46)+
-        '<div class="rsvp-name">'+p.name+'</div>'+
-        '<div class="rsvp-status">'+statusLabel+'</div>'+
-        btnHtml;
-      rg.appendChild(div);
-    });
-    document.getElementById('rsvp-counts').innerHTML=
-      '<span>Players: <strong>'+activePlayers.length+'</strong></span>'+
-      '<span class="cin">In: <strong>'+inC+'</strong></span>'+
-      '<span style="color:var(--gold)">Maybe: <strong>'+maybeC+'</strong></span>'+
-      '<span class="cout">Out: <strong>'+outC+'</strong></span>'+
-      '<span>TBD: <strong>'+(activePlayers.length-inC-maybeC-outC)+'</strong></span>';
-  }
-
-  // Subscribe to Firebase for live sync; fall back to localStorage
-  loadLocalStatuses();
-  buildRsvpGrid(); // render immediately with local data
-  try {
-    firebase.database().ref(fbKey).on('value',function(snap){
-      fbStatuses=snap.val()||{};
-      fbLive=true;
-      buildRsvpGrid(); // re-render with live Firebase data
-    });
-  } catch(e){
-    // Firebase not yet configured — localStorage fallback active
-    console.info('RSVP running in local-only mode. Set up firebase-config.js to sync across devices.');
-  }
-
-  picker.addEventListener('change',function(){
-    myName=picker.value;
-    if(myName) localStorage.setItem('tpl_myname',myName);
-    else localStorage.removeItem('tpl_myname');
+// ── FIREBASE / RSVP ──
+var fbKey='rsvp_'+ng.date.replace(/-/g,'_');
+var fbStatuses={};var fbLive=false;
+function loadLocal(){try{var s=localStorage.getItem('tpl_rsvp_'+fbKey);fbStatuses=s?JSON.parse(s):{};}catch(e){fbStatuses={};}}
+function setStatus(status){
+  if(!myName)return;
+  if(fbLive){
+    try{firebase.database().ref(fbKey+'/'+myName).set(status);}catch(e){console.warn('Firebase:',e.message);}
+  } else {
+    fbStatuses[myName]=status;
+    try{localStorage.setItem('tpl_rsvp_'+fbKey,JSON.stringify(fbStatuses));}catch(e){}
     buildRsvpGrid();
-    buildStandings();
-  });
-
-  // ── STANDINGS ──
-  document.getElementById('st-notice').innerHTML=
-    '⚠ Points sourced directly from Tod\'s APL tracker after Event 10. Points = starting chip stack at Season Final.';
-  var tbody=document.getElementById('st-body');
-
-  function buildStandings(){
-    tbody.innerHTML='';
-    sorted.forEach(function(p,i){
-      var rank=i+1;
-      var avgCls=p.avgPlace<=5?'avg-g':p.avgPlace<=10?'avg-m':'avg-l';
-      var isMe=myName&&p.name===myName;
-      var tr=document.createElement('tr');
-      tr.className=isMe?'me':'';
-      tr.innerHTML=
-        '<td><span class="rk '+(rank<=3?'rk'+rank:'')+'">'+(rank<=3?['🥇','🥈','🥉'][rank-1]:rank)+'</span></td>'+
-        '<td><div class="pc">'+
-          playerChip(p,i,38)+
-          '<div><div class="pn">'+p.name+'</div><div class="pfn">'+(p.fullName||'')+'</div></div>'+
-        '</div></td>'+
-        '<td class="sc hide-m">'+p.events+'</td>'+
-        '<td><span class="pts">'+p.points.toLocaleString()+'</span></td>'+
-        '<td class="bar-wrap hide-m"><div class="bar-bg"><div class="bar-fill" style="width:'+(p.points/maxPts*100).toFixed(1)+'%"></div></div></td>'+
-        '<td class="hide-m">'+(p.wins>0?'<span class="wbadge">🏆 '+p.wins+'</span>':'-')+'</td>'+
-        '<td class="sc hide-m">'+p.cashes+'</td>'+
-        '<td class="sc '+avgCls+'">'+p.avgPlace.toFixed(1)+'</td>';
-      tbody.appendChild(tr);
-    });
   }
-  buildStandings();
+}
+window.setStatus=setStatus;
 
-  // ── LAST GAME (show 4 days only) ──
-  var lg=L.lastGame;
-  var lgDate=parseLocalDate(lg.date,0);
-  var daysSince=Math.floor((today-lgDate)/86400000);
-  if(daysSince<=4){
-    document.getElementById('last-game').style.display='block';
-    var nextEvLabel=nextEv?nextEv.label:'next event';
-    document.getElementById('lg-title2').innerHTML='Last Game <span class="dim">— '+lg.label+'</span>';
-    document.getElementById('lg-h3').textContent=lg.label+' — '+lg.winner+' Wins';
-    var lgD=parseLocalDate(lg.date,12);
-    document.getElementById('lg-meta').textContent=
-      lgD.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+
-      ' · '+lg.playerCount+' players · $'+lg.kitty+' kitty';
-    document.getElementById('lg-recap').textContent=lg.recap;
-    var ul=document.getElementById('res-list');
-    lg.results.forEach(function(r){
-      var li=document.createElement('li');
-      li.className='res-row'+(r.itm?' itm':'');
-      var bcls=r.place===1?'pb1':r.place===2?'pb2':r.place===3?'pb3':'pbo';
-      li.innerHTML=
-        '<div class="pb '+bcls+'">'+r.place+'</div>'+
-        '<div class="rn">'+r.name+'</div>'+
-        '<div class="rp">'+r.points.toLocaleString()+' pts</div>'+
-        '<div class="rw">'+(r.winnings>0?'$'+r.winnings:'')+'</div>';
-      ul.appendChild(li);
-    });
-    document.getElementById('lg-side').innerHTML=
-      '<div class="ic"><div class="ic-lbl">Up Next</div>'+
-      '<div class="ic-date">'+ngDate.toLocaleDateString('en-US',{month:'long',day:'numeric'})+'</div>'+
-      '<div class="ic-sub">'+(ng.time||'8:00 PM')+' · '+nextEvLabel+'</div></div>'+
-      '<div class="ic"><div class="ic-lbl">Buy-In</div>'+
-      '<div class="ic-val">$40 + Optional Rebuy</div>'+
-      '<div class="ic-sub">One rebuy available through the break (round 4-5)</div></div>'+
-      (lg.highHand&&lg.highHand.player?
-        '<div class="ic"><div class="ic-lbl">Notable Hand</div>'+
-        '<div class="ic-val">'+lg.highHand.player+'</div>'+
-        '<div class="ic-sub">'+(lg.highHand.description||'')+'</div></div>':'');
+// ── FLASH ANIMATION ──
+function flash(id){
+  var el=document.getElementById(id);if(!el)return;
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
+
+// ── DONUT UPDATE ──
+function updateDonut(inC,mayC,outC,total){
+  var tbd=Math.max(0,total-inC-mayC-outC);
+  var inD=total>0?(inC/total*360):0;
+  var mayD=total>0?(mayC/total*360):0;
+  var outD=total>0?(outC/total*360):0;
+  var s1=inD,s2=s1+mayD,s3=s2+outD;
+  var dr=document.getElementById('rsvp-donut');
+  if(dr){
+    if(total===0){dr.style.background='conic-gradient(var(--faint) 0deg 360deg)';}
+    else{dr.style.background='conic-gradient(#22c55e 0deg '+inD.toFixed(1)+'deg,#f5c842 '+inD.toFixed(1)+'deg '+s2.toFixed(1)+'deg,#ef4444 '+s2.toFixed(1)+'deg '+s3.toFixed(1)+'deg,#3a3a55 '+s3.toFixed(1)+'deg 360deg)';}
   }
+  function se(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+  se('donut-num',inC);se('cnt-in',inC);se('cnt-maybe',mayC);se('cnt-out',outC);se('cnt-tbd',tbd);
+  se('h-in',inC);se('h-maybe',mayC);se('h-out',outC);se('h-tbd',tbd);
+  ['donut-num','cnt-in','cnt-maybe','cnt-out','cnt-tbd','h-in','h-maybe','h-out','h-tbd'].forEach(flash);
+}
 
-  // ── SCHEDULE ──
-  var nextIdx=L.schedule.findIndex(function(e){return !e.completed;});
-  var sl=document.getElementById('sched-list');
-  L.schedule.forEach(function(ev,i){
-    var isNext=i===nextIdx;
-    var cls='up', tag='';
-    if(ev.completed)              {cls='done';  tag='<span class="stag t-done">Done ✓</span>';}
-    else if(isNext)               {cls='nxt';   tag='<span class="stag t-nxt">▶ Next</span>';}
-    else if(ev.type==='tournament'){cls='tourn'; tag='<span class="stag t-tourn">Tournament</span>';}
-    else if(ev.type==='final')    {cls='fin';   tag='<span class="stag t-fin">Final</span>';}
-    else                          {tag='<span class="stag t-up">Upcoming</span>';}
-    var d=parseLocalDate(ev.date,12);
-    var ds=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    var div=document.createElement('div');
-    div.className='si '+cls;
-    div.innerHTML='<span class="si-date">'+ds+'</span><span class="si-name">'+ev.label+(ev.note?' <small style="opacity:.45;font-weight:400">— '+ev.note+'</small>':'')+'</span>'+tag;
-    sl.appendChild(div);
+// ── BUILD RSVP GRID ──
+function buildRsvpGrid(){
+  var grid=document.getElementById('rsvp-grid');if(!grid)return;
+  var total=L.standings.length,inC=0,mayC=0,outC=0;
+  L.standings.forEach(function(p){
+    var s=fbStatuses[p.name]||'';
+    if(s==='in')inC++;else if(s==='maybe')mayC++;else if(s==='out')outC++;
   });
-
-  // ── RECORDS ──
-  var rec=L.records;
-  document.getElementById('rec-grid').innerHTML=
-    '<div class="rc"><div class="rc-icon">🃏</div><div class="rc-lbl">High Hand — Season '+rec.highHandSeason.season+'</div><div class="rc-val">'+rec.highHandSeason.player+'</div><div class="rc-sub">'+(rec.highHandSeason.hand||'Not yet recorded')+'</div></div>'+
-    '<div class="rc"><div class="rc-icon">👑</div><div class="rc-lbl">High Hand — All Time</div><div class="rc-val">'+rec.highHandAllTime.player+'</div><div class="rc-sub">'+(rec.highHandAllTime.hand||'Not yet recorded')+'</div></div>'+
-    '<div class="rc"><div class="rc-icon">🏆</div><div class="rc-lbl">Most Career Wins</div><div class="rc-val">'+rec.mostWins.player+'</div><div class="rc-sub">'+rec.mostWins.count+' wins · '+rec.mostWins.note+'</div></div>'+
-    '<div class="rc"><div class="rc-icon">♠</div><div class="rc-lbl">Most Seasons Played</div><div class="rc-val">'+rec.mostSeasons.player+'</div><div class="rc-sub">'+rec.mostSeasons.count+' seasons · '+rec.mostSeasons.note+'</div></div>';
-
-  // ── ROSTER ──
-  var rostGrid=document.getElementById('roster-grid');
-  sorted.forEach(function(p,i){
-    var div=document.createElement('div'); div.className='roc';
-    div.innerHTML=
-      '<div class="ro-chip">'+playerChip(p,i,64)+'</div>'+
-      '<div class="ro-name">'+p.name+'</div>'+
-      '<div class="ro-full">'+(p.fullName||'')+'</div>'+
-      '<div class="ro-pts">'+p.points.toLocaleString()+' pts</div>'+
-      '<div class="ro-rank">#'+(i+1)+' of '+sorted.length+'</div>';
-    rostGrid.appendChild(div);
-  });
-
-  // ── CHAMPIONS ──
-  var cg=document.getElementById('champs');
-  L.champions.forEach(function(c){
-    var div=document.createElement('div'); div.className='ch';
-    div.innerHTML='<div class="ch-s">Season '+c.season+' · '+c.year+'</div><div class="ch-n">'+c.champion+'</div><div class="ch-note">'+(c.note||'')+'</div>';
-    cg.appendChild(div);
-  });
-
-  // ── ARCHIVES ──
-  var CURRENT_SEASON=L.season;
-  var s20Events=L.schedule.map(function(ev){
-    if(ev.label===L.lastGame.label) return {label:ev.label,date:ev.date,completed:ev.completed,data:L.lastGame};
-    return {label:ev.label,date:ev.date,completed:ev.completed,data:null};
-  });
-  var historyMap={};
-  (L.history||[]).forEach(function(s){historyMap[s.season]=s;});
-
-  var seasonSel=document.getElementById('arch-season');
-  for(var s=CURRENT_SEASON;s>=1;s--){
-    var opt=document.createElement('option'); opt.value=s;
-    var hasData=(s===CURRENT_SEASON)||(historyMap[s]&&historyMap[s].events&&historyMap[s].events.length);
-    opt.textContent='Season '+s+(s===CURRENT_SEASON?' (Current)':'')+((!hasData&&s<CURRENT_SEASON)?' — data coming soon':'');
-    seasonSel.appendChild(opt);
-  }
-
-  var eventSel=document.getElementById('arch-event');
-  var archPanel=document.getElementById('arch-panel');
-
-  function setPlaceholder(msg){
-    archPanel.innerHTML='<div class="arch-placeholder"><div class="big">♠</div><div>'+msg+'</div></div>';
-  }
-
-  function renderEventResults(ev){
-    var d=ev.data;
-    if(!d){
-      setPlaceholder(ev.completed
-        ? 'Results for this event haven\'t been entered yet.'
-        : 'This event hasn\'t been played yet.');
-      return;
+  updateDonut(inC,mayC,outC,total);
+  var html='';
+  L.standings.forEach(function(p,i){
+    var s=fbStatuses[p.name]||'';
+    var isMe=(p.name===myName);
+    var sClass=s?'status-'+s:'';var mClass=isMe?' is-me':'';
+    var badge='';
+    if(s==='in')badge='<span class="rc-badge sin">✓ In</span>';
+    else if(s==='maybe')badge='<span class="rc-badge smb">? Maybe</span>';
+    else if(s==='out')badge='<span class="rc-badge sout">✗ Out</span>';
+    else badge='<span class="rc-badge stbd">— TBD</span>';
+    var btns='';
+    if(isMe){
+      var ia=s==='in'?' class="a-in"':'';var ma=s==='maybe'?' class="a-mb"':'';var oa=s==='out'?' class="a-out"':'';
+      btns='<div class="rsvp-btns"><button'+ia+' onclick="setStatus(\'in\')">✓ In</button><button'+ma+' onclick="setStatus(\'maybe\')">? Maybe</button><button'+oa+' onclick="setStatus(\'out\')">✗ Out</button></div>';
     }
-    var evDate=parseLocalDate(d.date,12);
-    var ds=evDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-    var html='<h3>'+d.label+' — '+d.winner+' Wins</h3>';
-    html+='<div class="arch-meta">'+ds+' &nbsp;·&nbsp; '+d.playerCount+' players &nbsp;·&nbsp; $'+d.kitty+' kitty</div>';
-    if(d.recap) html+='<p style="font-size:0.83rem;color:var(--dim);margin-bottom:1.2rem;line-height:1.7">'+d.recap+'</p>';
-    html+='<table><thead><tr><th>#</th><th>Player</th><th style="text-align:right">Points</th><th style="text-align:right">Winnings</th></tr></thead><tbody>';
-    d.results.forEach(function(r){
-      var medal=r.place===1?'🥇':r.place===2?'🥈':r.place===3?'🥉':r.place;
-      html+='<tr class="'+(r.itm?'arch-itm':'')+'">'+
-        '<td style="font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;color:var(--faint)">'+medal+'</td>'+
-        '<td style="font-weight:'+(r.itm?'600':'400')+'">'+r.name+'</td>'+
-        '<td class="arch-pts">'+r.points.toLocaleString()+'</td>'+
-        '<td class="arch-w">'+(r.winnings>0?'$'+r.winnings:'')+'</td>'+
-      '</tr>';
-    });
-    html+='</tbody></table>';
-    archPanel.innerHTML=html;
-  }
-
-  seasonSel.addEventListener('change',function(){
-    var s=parseInt(seasonSel.value,10);
-    eventSel.innerHTML='<option value="">— Select an Event —</option>';
-    eventSel.disabled=true;
-    archPanel.innerHTML='<div class="arch-placeholder"><div class="big">♥</div><div>Now pick an event</div></div>';
-    if(!s) return;
-    var events;
-    if(s===CURRENT_SEASON){ events=s20Events; }
-    else if(historyMap[s]){ events=historyMap[s].events.map(function(ev){return {label:ev.label,date:ev.date,completed:true,data:ev};}); }
-    else {
-      events=Array.from({length:16},function(_,i){return {label:'Event '+(i+1),date:'',completed:false,data:null,noData:true};});
-    }
-    events.forEach(function(ev,i){
-      var o=document.createElement('option'); o.value=i;
-      o.textContent=ev.label+(ev.completed&&!ev.noData?'':ev.noData?' — no data':!ev.completed?' (upcoming)':'');
-      eventSel.appendChild(o);
-    });
-    eventSel.disabled=false; eventSel._events=events;
+    html+='<div class="rsvp-card'+sClass+mClass+'">'+playerChip(p,i,46)+'<div class="rc-name">'+p.name+'</div>'+badge+btns+'</div>';
   });
+  grid.innerHTML=html;
+}
 
-  eventSel.addEventListener('change',function(){
-    var idx=parseInt(eventSel.value,10);
-    if(isNaN(idx)||!eventSel._events){setPlaceholder('Pick an event above');return;}
-    var ev=eventSel._events[idx];
-    if(ev.noData){
-      var s2=parseInt(seasonSel.value,10);
-      var champ=L.champions.find(function(c){return c.season===s2;});
-      setPlaceholder('Historical data for Season '+s2+' hasn\'t been entered yet.'+(champ?' Season champion: <strong>'+champ.champion+'</strong>':'')+'<br><small style="margin-top:0.4rem;display:block;color:var(--faint)">Ask Tod for the records and paste them into Admin to unlock this archive.</small>');
-      return;
-    }
-    renderEventResults(ev);
+// ── ANNOUNCEMENTS ──
+(function(){
+  var div=document.getElementById('announcements');if(!div)return;
+  (L.announcements||[]).filter(function(a){return a.active;}).forEach(function(a){
+    var b=document.createElement('div');b.className='ann-bar ann-'+a.type;
+    b.innerHTML='<span class="ann-icon">'+(a.icon||'📢')+'</span><span>'+a.text+'</span>';
+    div.appendChild(b);
   });
-});
+})();
+
+// ── SEASON STATS ──
+(function(){
+  var div=document.getElementById('statsInner');if(!div||!L.standings||!L.standings.length)return;
+  var done=(L.schedule||[]).filter(function(e){return e.completed;}).length;
+  var top=L.standings[0];
+  div.innerHTML=
+    '<div class="sb hi"><div class="sb-val">'+top.points.toLocaleString()+'</div><div class="sb-lbl">Points Leader ('+top.name+')</div></div>'+
+    '<div class="sb"><div class="sb-val">'+done+'</div><div class="sb-lbl">Events Played</div></div>'+
+    '<div class="sb"><div class="sb-val">'+L.standings.length+'</div><div class="sb-lbl">Active Players</div></div>'+
+    '<div class="sb"><div class="sb-val">$1,300</div><div class="sb-lbl">Season Final Prize</div></div>'+
+    '<div class="sb"><div class="sb-val">Sep 1</div><div class="sb-lbl">Season Final Date</div></div>';
+})();
+
+// ── INIT ──
+loadLocal();
+buildRsvpGrid();
+try{
+  firebase.database().ref(fbKey).on('value',function(snap){
+    fbStatuses=snap.val()||{};fbLive=true;buildRsvpGrid();
+  });
+}catch(e){console.info('Local RSVP mode');}
 </script>
 </body>
 </html>
